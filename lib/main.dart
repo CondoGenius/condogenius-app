@@ -3,6 +3,7 @@ import 'package:condo_genius_beta/pages/components/splash.dart';
 import 'package:condo_genius_beta/pages/denuncias/denuncias.dart';
 import 'package:condo_genius_beta/pages/entrega/entrega.dart';
 import 'package:condo_genius_beta/pages/home.dart';
+import 'package:condo_genius_beta/pages/login/login.dart';
 import 'package:condo_genius_beta/pages/perfil/perfil.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +22,7 @@ class CondoGenius extends StatelessWidget {
       routes: {
         '/': (context) => const Splash(),
         '/Home': (context) => const HomePage(),
+        '/login': (context) => const Login(),
         '/Perfil':(context) => const Perfil(),
         '/Academia':(context) => const Academia(),
         '/Entrega':(context) => const Entrega(),

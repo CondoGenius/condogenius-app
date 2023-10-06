@@ -2,6 +2,26 @@ import 'package:condo_genius_beta/pages/components/menu.dart';
 import 'package:condo_genius_beta/pages/perfil/perfil.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+String? user;
+
+// Check if the user is logged in
+Future<bool> isUserLoggedIn() async {
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
+  final String? token = sharedPreferences.getString('token');
+  user = sharedPreferences.getString('user');
+
+  // Check if the token exists
+  if (token != null) {
+    // The user is logged in
+    return true;
+  } else {
+    // The user is not logged in
+    return false;
+  }
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,6 +31,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    isUserLoggedIn().then((logado) {
+      if (!logado) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,9 +170,9 @@ class _HomePageState extends State<HomePage> {
                         ),
                         child: Column(
                           children: [
-                            const Row(
+                             Row(
                               children: [
-                                CircleAvatar(
+                                const CircleAvatar(
                                   radius: 21,
                                   backgroundColor:
                                       Color.fromARGB(255, 182, 182, 182),
@@ -153,22 +183,22 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.all(
+                                  padding: const EdgeInsets.all(
                                       10), //apply padding to all four sides
                                   child: Text(
-                                    'Julia Screffer',
-                                    style: TextStyle(
+                                    user ?? '',
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 15,
                                     ),
                                   ),
                                 ),
-                                Padding(
+                                const Padding(
                                   padding: EdgeInsets.all(
                                       10), //apply padding to all four sides
                                   child: Text("-"),
                                 ),
-                                Text(
+                                const Text(
                                   '24 de abri',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 99, 99, 99)),

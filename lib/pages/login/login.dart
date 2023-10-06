@@ -1,5 +1,10 @@
+// ignore_for_file: avoid_print
+import 'dart:convert';
+import 'dart:developer';
 import 'package:condo_genius_beta/pages/home.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -9,6 +14,9 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final _senhaController = TextEditingController();
+  final _loginController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,38 +48,22 @@ class _LoginState extends State<Login> {
                       child: Image.asset("assets/condogenius.png"),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(30),
+                  Padding(
+                    padding: const EdgeInsets.all(30),
                     child: Column(
                       children: [
-                        // TextField(
-                        //   keyboardType: TextInputType.emailAddress,
-                        //   decoration: InputDecoration(
-                        //     hintText: 'Email',
-                        //     labelText: 'Email',
-                        //     hintStyle: TextStyle(fontSize: 16),
-                        //     border: OutlineInputBorder(
-                        //       borderRadius:
-                        //           BorderRadius.all(Radius.circular(20)),
-                        //       borderSide: BorderSide(
-                        //         width: 0,
-                        //         // style: BorderStyle.none,
-                        //       ),
-                        //     ),
-                        //     filled: true,
-                        //     contentPadding: EdgeInsets.all(10),
-                        //   ),
-                        // ),
                         PhysicalModel(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(50)),
                           color: Colors.white,
                           elevation: 5.0,
                           shadowColor: Colors.black,
                           child: TextField(
+                            controller: _loginController,
                             keyboardType: TextInputType.emailAddress,
                             obscureText: false,
                             autofocus: false,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Email',
                               fillColor: Colors.white,
                               filled: false,
@@ -88,18 +80,20 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         PhysicalModel(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(50)),
                           color: Colors.white,
                           elevation: 5.0,
                           shadowColor: Colors.black,
                           child: TextField(
+                            controller: _senhaController,
                             obscureText: true,
                             autofocus: false,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Senha',
                               fillColor: Colors.white,
                               filled: false,
@@ -128,11 +122,12 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()),
-                      );
+                      logar();
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => const HomePage()),
+                      // );
                     },
                     child: const Text('LOGIN'),
                   ),
@@ -144,7 +139,8 @@ class _LoginState extends State<Login> {
                   // const SizedBox(height: 10),
                   InkWell(
                     onTap: () {},
-                    child: const Text("Cadastre-se", style: TextStyle(color: Colors.black)),
+                    child: const Text("Cadastre-se",
+                        style: TextStyle(color: Colors.black)),
                   ),
                 ],
               ),
@@ -153,5 +149,38 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
+  }
+
+  void logar() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    var body = json.encode(
+        {'User': _loginController.text, 'Password': _senhaController.text});
+
+    var url = Uri.parse('http://192.168.1.74:5000/api/auth/login');
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body);
+
+    if (response.statusCode == 200) {
+      String token = json.decode(response.body)['jwtToken'];
+      String name = json.decode(response.body)['user'];
+      await sharedPreferences.setString('token', 'Token $token');
+      await sharedPreferences.setString('user', name);
+      //ignore: use_build_context_synchronously
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login Inválido !'),
+        ),
+      );
+    }
   }
 }
