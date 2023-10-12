@@ -5,6 +5,7 @@ import 'package:condo_genius_beta/pages/entrega/entrega.dart';
 import 'package:condo_genius_beta/pages/home.dart';
 import 'package:condo_genius_beta/pages/login/login.dart';
 import 'package:condo_genius_beta/pages/perfil/perfil.dart';
+import 'package:condo_genius_beta/pages/register/register.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -22,6 +23,7 @@ class CondoGenius extends StatelessWidget {
       routes: {
         '/': (context) => const Splash(),
         '/Home': (context) => const HomePage(),
+        '/Register': (context) => const Register(),
         '/login': (context) => const Login(),
         '/Perfil':(context) => const Perfil(),
         '/Academia':(context) => const Academia(),

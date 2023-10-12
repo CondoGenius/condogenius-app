@@ -1,22 +1,23 @@
 // ignore_for_file: avoid_print
 import 'dart:convert';
-import 'package:condo_genius_beta/pages/home.dart';
+import 'package:condo_genius_beta/pages/login/login.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class Register extends StatefulWidget {
+  const Register({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<Register> createState() => _RegisterState();
 }
 
-class _LoginState extends State<Login> {
+class _RegisterState extends State<Register> {
   final _senhaController = TextEditingController();
   final _loginController = TextEditingController();
+  final _confirController = TextEditingController();
   bool _erroEmail = false;
   bool _erroPassword = false;
+  bool _erroConfirmPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +26,10 @@ class _LoginState extends State<Login> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           padding: const EdgeInsets.only(
-            top: 100,
+            top: 80,
             left: 40,
             right: 40,
-            bottom: 90,
+            bottom: 30,
           ),
           color: const Color.fromRGBO(12, 192, 223, 1),
           child: Container(
@@ -128,6 +129,48 @@ class _LoginState extends State<Login> {
                               style: TextStyle(color: Colors.red),
                             ),
                           ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        PhysicalModel(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(50)),
+                          color: Colors.white,
+                          elevation: 5.0,
+                          shadowColor:
+                              _erroConfirmPassword ? Colors.red : Colors.black,
+                          child: TextFormField(
+                            controller: _confirController,
+                            obscureText: true,
+                            autofocus: false,
+                            decoration: const InputDecoration(
+                              hintText: 'Confirmar Senha',
+                              fillColor: Colors.white,
+                              filled: false,
+                              contentPadding:
+                                  EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20)),
+                                borderSide: BorderSide(
+                                  width: 0,
+                                  style: BorderStyle.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_erroConfirmPassword)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 6),
+                            child: Text(
+                              'Campo obrigatório',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        const SizedBox(
+                          height: 20,
+                        ),
                       ],
                     ),
                   ),
@@ -141,25 +184,32 @@ class _LoginState extends State<Login> {
                     ),
                     onPressed: () {
                       if (_loginController.text.isEmpty &&
-                          _senhaController.text.isEmpty) {
+                          _senhaController.text.isEmpty &&
+                          _confirController.text.isEmpty) {
                         _erroEmail = true;
                         _erroPassword = true;
+                        _erroConfirmPassword = true;
                       } else {
                         _erroEmail = false;
                         _erroPassword = false;
+                        _erroConfirmPassword = false;
                         logar();
                       }
                       FocusScope.of(context).unfocus();
                     },
-                    child: const Text('LOGIN'),
+                    child: const Text('REGISTRAR'),
                   ),
-                  const SizedBox(height: 70),
+                  const SizedBox(height: 30),
+                  // InkWell(
+                  //   onTap: () {},
+                  //   child: const Text("Esqueci minha senha >"),
+                  // ),
+                  // const SizedBox(height: 10),
                   InkWell(
                     onTap: () {
-                      //navegar para a pagina register
-                      Navigator.pushNamed(context, '/Register');
+                      Navigator.pushNamed(context, '/login');
                     },
-                    child: const Text("Cadastre-se",
+                    child: const Text("Voltar",
                         style: TextStyle(color: Colors.black)),
                   ),
                 ],
@@ -171,27 +221,27 @@ class _LoginState extends State<Login> {
     );
   }
 
-  // transferir para outro arquivo
   void logar() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var body = json.encode({
+      'Email': _loginController.text,
+      'Password': _senhaController.text,
+      'RoleId': 1
+    });
 
-    final response = await Dio().post(
-      'http://192.168.1.74:5000/api/auth/login',
-      data: {'User': _loginController.text, 'Password': _senhaController.text},
-      options: Options(
-        headers: {'Content-Type': 'application/json'},
-      ),
-    );
+    var url = Uri.parse('http://192.168.1.74:5000/api/user');
+    var response = await http.post(url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body);
+
+        print('codigo de retorno: ' + response.statusCode.toString());
 
     if (response.statusCode == 200) {
-      String token = json.decode(response.data)['jwtToken'];
-      String name = json.decode(response.data)['user'];
-      await sharedPreferences.setString('token', 'Token $token');
-      await sharedPreferences.setString('user', name);
-      //ignore: use_build_context_synchronously
+      // ignore: use_build_context_synchronously
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const Login()),
       );
     } else {
       // ignore: use_build_context_synchronously
@@ -201,7 +251,7 @@ class _LoginState extends State<Login> {
               Color.fromARGB(255, 82, 82, 82), // Definindo o fundo como branco
           content: Center(
             child: Text(
-              'Login Inválido !',
+              'Não foi possivel cadastrar o usuário !',
               style: TextStyle(
                 color: Color.fromARGB(255, 255, 255,
                     255), // Definindo a cor do texto como preto (opcional)

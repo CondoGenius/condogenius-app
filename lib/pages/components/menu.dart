@@ -3,6 +3,11 @@ import 'package:condo_genius_beta/pages/denuncias/denuncias.dart';
 import 'package:condo_genius_beta/pages/entrega/entrega.dart';
 import 'package:condo_genius_beta/pages/home.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<bool> isUserLogout() async {
+  return true;
+}
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -87,10 +92,30 @@ class Menu extends StatelessWidget {
             leading: const Icon(Icons.report_gmailerrorred),
             title: const Text('DENÚNCIAS'), // for Right
             onTap: () {
-               Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const Denuncias()),
               );
+            },
+            shape: const Border(
+              bottom: BorderSide(
+                color: Color.fromARGB(255, 224, 224, 224),
+              ),
+            ), // for Left
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.arrow_back,
+              color: Colors.red, // Defina a cor do ícone aqui
+            ),
+            title: const Text('SAIR'), // for Right
+            onTap: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.remove('token');
+              await prefs.remove('user');
+
+              // ignore: use_build_context_synchronously
+              Navigator.of(context).pushReplacementNamed('/login');
             },
             shape: const Border(
               bottom: BorderSide(

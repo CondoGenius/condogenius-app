@@ -39,6 +39,7 @@ dependencies:
   percent_indicator: ^4.2.3
   http: ^1.1.0
   shared_preferences: ^2.2.1
+  dio: ^5.3.3
 
 dev_dependencies:
   flutter_test:
