@@ -175,19 +175,17 @@ class _LoginState extends State<Login> {
   void logar() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    final response = await Dio().post(
-      'http://192.168.1.74:5000/api/auth/login',
-      data: {'User': _loginController.text, 'Password': _senhaController.text},
-      options: Options(
-        headers: {'Content-Type': 'application/json'},
-      ),
-    );
+    const url = 'http://192.168.1.74:5000/gateway/login';
+
+    final response = await Dio().post(url, data: {
+      'email': _loginController.text,
+      'password': _senhaController.text
+    });
 
     if (response.statusCode == 200) {
-      String token = json.decode(response.data)['jwtToken'];
-      String name = json.decode(response.data)['user'];
+      String token = response.data['token'];
       await sharedPreferences.setString('token', 'Token $token');
-      await sharedPreferences.setString('user', name);
+      await sharedPreferences.setString('email', _loginController.text);
       //ignore: use_build_context_synchronously
       Navigator.push(
         context,

@@ -1,10 +1,9 @@
 import 'package:condo_genius_beta/pages/components/menu.dart';
 import 'package:condo_genius_beta/pages/perfil/perfil.dart';
+import 'package:condo_genius_beta/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:condo_genius_beta/pages/services/auth_service.dart';
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 

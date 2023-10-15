@@ -112,7 +112,6 @@ class Menu extends StatelessWidget {
             onTap: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.remove('token');
-              await prefs.remove('user');
 
               // ignore: use_build_context_synchronously
               Navigator.of(context).pushReplacementNamed('/login');

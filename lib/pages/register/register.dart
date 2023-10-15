@@ -1,8 +1,9 @@
 // ignore_for_file: avoid_print
 import 'dart:convert';
-import 'package:condo_genius_beta/pages/login/login.dart';
+import 'package:condo_genius_beta/pages/home.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -222,29 +223,49 @@ class _RegisterState extends State<Register> {
   }
 
   void logar() async {
-    var body = json.encode({
-      'Email': _loginController.text,
-      'Password': _senhaController.text,
-      'RoleId': 1
+    final body = json.encode({
+      'email': _loginController.text,
+      'password': _senhaController.text,
+      'role_id': 1
     });
 
-    var url = Uri.parse('http://192.168.1.74:5000/api/user');
-    var response = await http.post(url,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: body);
+    const url = 'http://192.168.1.74:5000/gateway/user/register';
+    final dio = Dio();
 
-        print('codigo de retorno: ' + response.statusCode.toString());
+    try {
+      final response = await dio.post(url, data: body);
 
-    if (response.statusCode == 200) {
-      // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const Login()),
-      );
-    } else {
-      // ignore: use_build_context_synchronously
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+
+      if (response.statusCode == 201) {
+        String token = response.data['token'];
+        await sharedPreferences.setString('token', 'Token $token');
+        await sharedPreferences.setString('email', _loginController.text);
+        // ignore: use_build_context_synchronously
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color.fromARGB(
+                255, 82, 82, 82), // Definindo o fundo como branco
+            content: Center(
+              child: Text(
+                'Não foi possivel cadastrar o usuário !',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 255, 255,
+                      255), // Definindo a cor do texto como preto (opcional)
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor:
