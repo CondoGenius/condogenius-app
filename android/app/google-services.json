@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "780347999304",
+    "project_id": "condogenius-125bd",
+    "storage_bucket": "condogenius-125bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:780347999304:android:f551c4687d6e9d3fab447d",
+        "android_client_info": {
+          "package_name": "com.condogenius"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYi55nWskf3_4OciXfoOgzdBT9dJnuBCk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:780347999304:android:8ce38bc8e40132e4ab447d",
+        "android_client_info": {
+          "package_name": "com.example.condo_genius_beta"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYi55nWskf3_4OciXfoOgzdBT9dJnuBCk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -184,8 +184,9 @@ class _LoginState extends State<Login> {
 
     if (response.statusCode == 200) {
       String token = response.data['token'];
+      String email = response.data['email'];
       await sharedPreferences.setString('token', 'Token $token');
-      await sharedPreferences.setString('email', _loginController.text);
+      await sharedPreferences.setString('email',  email);
       //ignore: use_build_context_synchronously
       Navigator.push(
         context,

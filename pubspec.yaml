@@ -40,6 +40,10 @@ dependencies:
   http: ^1.1.0
   shared_preferences: ^2.2.1
   dio: ^5.3.3
+  firebase_core: ^2.20.0
+  firebase_messaging: ^14.7.1
+  flutter_local_notifications: ^16.1.0
+  timezone: ^0.9.2
 
 dev_dependencies:
   flutter_test:
