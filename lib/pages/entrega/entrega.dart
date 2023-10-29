@@ -1,8 +1,11 @@
 import 'package:condo_genius_beta/models/delivery_model.dart';
 import 'package:condo_genius_beta/pages/components/menu.dart';
 import 'package:condo_genius_beta/pages/home.dart';
+import 'package:condo_genius_beta/pages/login/login.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class Entrega extends StatefulWidget {
   const Entrega({super.key});
@@ -12,11 +15,27 @@ class Entrega extends StatefulWidget {
 }
 
 Future<List<DeliveryModel>> fetchItems() async {
-  final response = await Dio().get('http://192.168.1.74:7003/api/deliveries');
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  final String? token = sharedPreferences.getString('token');
+  final dio = Dio();
+
+  final response = await dio.get(
+    'http://192.168.1.74:5000/gateway/api/deliveries',
+    options: Options(
+      contentType: Headers.jsonContentType,
+      responseType: ResponseType.json,
+      validateStatus: (_) => true,
+      headers: {
+        'x-access-token': token
+      }, // Adicione o cabeçalho x-access-token aqui
+    ),
+  );
 
   if (response.statusCode == 200) {
     final List<dynamic> data = response.data;
     return data.map((item) => DeliveryModel.fromJson(item)).toList();
+  } else if (response.statusCode == 401) {
+    throw Exception('Login Expirado');
   } else {
     throw Exception('Falha ao carregar dados da API');
   }
@@ -102,7 +121,12 @@ class _EntregaState extends State<Entrega> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Erro: ${snapshot.error}'));
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const Login(),
+                    ),
+                  );
+                  return Container();
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
                       child: Text('Nenhuma entrega encontrada.'));
@@ -142,10 +166,12 @@ class _EntregaState extends State<Entrega> {
                               child: Column(
                                 children: [
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .center, // Define a centralização dos elementos na linha
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.all(
-                                            10), //apply padding to all four sides
+                                            10), // Aplicar preenchimento a todos os lados
                                         child: Text(
                                           delivery.status,
                                           style: const TextStyle(
@@ -154,35 +180,61 @@ class _EntregaState extends State<Entrega> {
                                           ),
                                         ),
                                       ),
-                                      const Padding(
-                                        padding: EdgeInsets.all(
-                                            10), //apply padding to all four sides
-                                        child: Text("-"),
-                                      ),
-                                      Text(
-                                        delivery.delivered_at,
-                                        style: const TextStyle(
-                                            color: Color.fromARGB(
-                                                255, 99, 99, 99)),
-                                      )
                                     ],
                                   ),
-                                  // const Column(
-                                  //   children: [
-                                  //     Align(
-                                  //       alignment: Alignment.centerLeft,
-                                  //       child: Text('Horário: 17:25 PM'),
-                                  //     ),
-                                  //     Align(
-                                  //       alignment: Alignment.centerLeft,
-                                  //       child: Text('AP: 62'),
-                                  //     ),
-                                  //     Align(
-                                  //       alignment: Alignment.centerLeft,
-                                  //       child: Text('Colaborador: João Porteiro'),
-                                  //     ),
-                                  //   ],
-                                  // ),
+                                  Column(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          children: [
+                                            const Text(
+                                              'Data: ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              formatDateTime(
+                                                  delivery.delivered_at),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          children: [
+                                            const Text(
+                                              'Residência: ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              delivery.residence_id.toString(),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          children: [
+                                            const Text(
+                                              'Colaborador: ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${delivery.admin_name} ${delivery.admin_last_name}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
@@ -199,4 +251,14 @@ class _EntregaState extends State<Entrega> {
       ),
     );
   }
+}
+
+String formatDateTime(String dateTimeString) {
+  // Converter a string em um objeto DateTime
+  DateTime dateTime = DateTime.parse(dateTimeString);
+
+  // Formatar a data e hora no formato desejado
+  String formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
+
+  return formattedDate;
 }

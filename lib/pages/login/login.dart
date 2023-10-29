@@ -20,16 +20,25 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double topPaddingPercentage = 10; // 10% da altura da tela
+    double leftPaddingPercentage = 5; // 5% da largura da tela
+    double rightPaddingPercentage = 5; // 5% da largura da tela
+    double bottomPaddingPercentage = 15; // 15% da altura da tela
+
+    EdgeInsetsGeometry padding = EdgeInsets.only(
+      top: screenHeight * (topPaddingPercentage / 100),
+      left: screenHeight * (leftPaddingPercentage / 100),
+      right: screenHeight * (rightPaddingPercentage / 100),
+      bottom: screenHeight * (bottomPaddingPercentage / 100),
+    );
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.only(
-            top: 100,
-            left: 40,
-            right: 40,
-            bottom: 90,
-          ),
+          height: screenHeight,
+          padding: padding,
           color: const Color.fromRGBO(12, 192, 223, 1),
           child: Container(
             decoration: BoxDecoration(
@@ -177,16 +186,45 @@ class _LoginState extends State<Login> {
 
     const url = 'http://192.168.1.74:5000/gateway/login';
 
-    final response = await Dio().post(url, data: {
-      'email': _loginController.text,
-      'password': _senhaController.text
-    });
+    final retunoLogin = await Dio().post(
+      url,
+      data: {'email': _loginController.text, 'password': _senhaController.text},
+      options: Options(
+          contentType: Headers.jsonContentType,
+          responseType: ResponseType.json,
+          validateStatus: (_) => true),
+    );
 
-    if (response.statusCode == 200) {
-      String token = response.data['token'];
-      String email = response.data['email'];
-      await sharedPreferences.setString('token', 'Token $token');
-      await sharedPreferences.setString('email',  email);
+    if (retunoLogin.statusCode == 200) {
+      String token = retunoLogin.data['token'];
+      String email = retunoLogin.data['email'];
+      int userId = retunoLogin.data['user_id'];
+      int residentId = retunoLogin.data['resident_id'];
+      await sharedPreferences.setString('token', token);
+      await sharedPreferences.setString('email', email);
+      await sharedPreferences.setInt('userId', userId);
+      await sharedPreferences.setInt('residentId', residentId);
+
+      final urlDadosUser =
+          'http://192.168.1.74:5000/gateway/residents/api/residents/user/${userId.toString()}';
+
+      final response = await Dio().get(
+        urlDadosUser,
+        options: Options(
+          contentType: Headers.jsonContentType,
+          responseType: ResponseType.json,
+          validateStatus: (_) => true,
+          headers: {
+            'x-access-token': token
+          }, // Adicione o cabeçalho x-access-token aqui
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        await sharedPreferences.setInt(
+            'residenceId', response.data['residence_id']);
+      }
+
       //ignore: use_build_context_synchronously
       Navigator.push(
         context,

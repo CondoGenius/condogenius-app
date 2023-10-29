@@ -90,7 +90,7 @@ class Menu extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.report_gmailerrorred),
-            title: const Text('DENÚNCIAS'), // for Right
+            title: const Text('RECLAMAÇÃO'), // for Right
             onTap: () {
               Navigator.push(
                 context,
@@ -112,7 +112,10 @@ class Menu extends StatelessWidget {
             onTap: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.remove('token');
-
+              await prefs.remove('email');
+              await prefs.remove('userId');
+              await prefs.remove('residentId');
+              await prefs.remove('residenceId');
               // ignore: use_build_context_synchronously
               Navigator.of(context).pushReplacementNamed('/login');
             },

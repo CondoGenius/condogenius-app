@@ -1,9 +1,11 @@
 import 'package:condo_genius_beta/pages/components/menu.dart';
-import 'package:condo_genius_beta/pages/perfil/perfil.dart';
 import 'package:condo_genius_beta/services/auth_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:condo_genius_beta/services/notifications_service.dart';
+import 'package:condo_genius_beta/firebase_options.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -11,9 +13,21 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+Future<void> _initializeFirebaseAndNotifications() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await FirebaseApi().iniNotifications();
+
+  // O código assíncrono foi movido para este método
+}
+
 class _HomePageState extends State<HomePage> {
   late AuthService authService;
-  
+
   bool isLoggedIn = false;
 
   @override
@@ -21,19 +35,16 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     authService = AuthService();
     checkLoginStatus();
+    _initializeFirebaseAndNotifications();
   }
 
   Future<void> checkLoginStatus() async {
     isLoggedIn = await authService.isUserLoggedIn();
-    if (isLoggedIn) {
-      // O usuário está logado
-      print('O usuário está logado.');
-    } else {
-      // O usuário não está logado
-      print('O usuário não está logado.');
+    if (!isLoggedIn) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, '/login');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,22 +68,22 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromARGB(255, 235, 235, 235),
         actions: [
-          CircleAvatar(
-            radius: 21,
-            backgroundColor: const Color.fromARGB(255, 182, 182, 182),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Perfil()),
-                );
-              },
-              child: const CircleAvatar(
-                radius: 21,
-                backgroundImage: ExactAssetImage('assets/avatar_h.png'),
-              ),
-            ),
-          ),
+          // CircleAvatar(
+          //   radius: 21,
+          //   backgroundColor: const Color.fromARGB(255, 182, 182, 182),
+          //   child: GestureDetector(
+          //     onTap: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(builder: (context) => const Perfil()),
+          //       );
+          //     },
+          //     child: const CircleAvatar(
+          //       radius: 21,
+          //       backgroundImage: ExactAssetImage('assets/avatar_h.png'),
+          //     ),
+          //   ),
+          // ),
           const SizedBox(width: 10),
           Builder(
             builder: (context) => IconButton(
@@ -98,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                     const Padding(
                       padding: EdgeInsets.all(30),
                       child: Text(
-                        'Avisos',
+                        'Hub Digital',
                         style: TextStyle(
                           decoration: TextDecoration.underline,
                           fontWeight: FontWeight.bold,
@@ -164,9 +175,9 @@ class _HomePageState extends State<HomePage> {
                         ),
                         child: Column(
                           children: [
-                             const Row(
+                            const Row(
                               children: [
-                                 CircleAvatar(
+                                CircleAvatar(
                                   radius: 21,
                                   backgroundColor:
                                       Color.fromARGB(255, 182, 182, 182),
@@ -177,22 +188,22 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:  EdgeInsets.all(
+                                  padding: EdgeInsets.all(
                                       10), //apply padding to all four sides
                                   child: Text(
                                     'Hellen Cristina',
-                                    style:  TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 15,
                                     ),
                                   ),
                                 ),
-                                 Padding(
+                                Padding(
                                   padding: EdgeInsets.all(
                                       10), //apply padding to all four sides
                                   child: Text("-"),
                                 ),
-                                 Text(
+                                Text(
                                   '24 de abri',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 99, 99, 99)),

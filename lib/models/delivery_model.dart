@@ -6,7 +6,8 @@ class DeliveryModel {
   final String created_at;
   final String updated_at;
   final int residence_id;
-  final String admin_id;
+  final String admin_name;
+  final String admin_last_name;
   final String admin_email;
 
   DeliveryModel({
@@ -17,7 +18,8 @@ class DeliveryModel {
     required this.created_at,
     required this.updated_at,
     required this.residence_id,
-    required this.admin_id,
+    required this.admin_name,
+    required this.admin_last_name,
     required this.admin_email,
   });
 
@@ -30,7 +32,8 @@ class DeliveryModel {
       created_at: json['created_at'],
       updated_at: json['updated_at'],
       residence_id: json['residence_id'],
-      admin_id: json['admin_id'],
+      admin_name: json['admin_name'],
+      admin_last_name: json['admin_last_name'],
       admin_email: json['admin_email'],
     );
   }

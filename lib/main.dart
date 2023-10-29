@@ -6,22 +6,11 @@ import 'package:condo_genius_beta/pages/home.dart';
 import 'package:condo_genius_beta/pages/login/login.dart';
 import 'package:condo_genius_beta/pages/perfil/perfil.dart';
 import 'package:condo_genius_beta/pages/register/register.dart';
-import 'package:condo_genius_beta/services/notifications_service.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-void main() async {
-
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await FirebaseApi().iniNotifications();
-
+void main()  {
   runApp(const CondoGenius());
 }
 

@@ -1,9 +1,7 @@
 // ignore_for_file: avoid_print
-import 'dart:convert';
 import 'package:condo_genius_beta/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -223,29 +221,80 @@ class _RegisterState extends State<Register> {
   }
 
   void logar() async {
-    final body = json.encode({
-      'email': _loginController.text,
-      'password': _senhaController.text,
-      'role_id': 1
-    });
-
     const url = 'http://192.168.1.74:5000/gateway/user/register';
     final dio = Dio();
 
-    try {
-      final response = await dio.post(url, data: body);
+    if (_senhaController.text != _confirController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor:
+              Color.fromARGB(255, 82, 82, 82), // Definindo o fundo como branco
+          content: Center(
+            child: Text(
+              'As senhas não conferem !',
+              style: TextStyle(
+                color: Color.fromARGB(255, 255, 255,
+                    255), // Definindo a cor do texto como preto (opcional)
+              ),
+            ),
+          ),
+        ),
+      );
+      return;
+    }
 
-      SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
+    try {
+      final response = await dio.post(
+        url,
+        data: {
+          'email': _loginController.text,
+          'password': _senhaController.text,
+          'role_id': 1
+        },
+        options: Options(
+            contentType: Headers.jsonContentType,
+            responseType: ResponseType.json,
+            validateStatus: (_) => true),
+      );
 
       if (response.statusCode == 201) {
-        String token = response.data['token'];
-        await sharedPreferences.setString('token', 'Token $token');
-        await sharedPreferences.setString('email', _loginController.text);
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color.fromARGB(
+                255, 40, 112, 194), // Definindo o fundo como branco
+            content: Center(
+              child: Text(
+                'Usuário cadastrado com sucesso !',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 255, 255,
+                      255), // Definindo a cor do texto como preto (opcional)
+                ),
+              ),
+            ),
+          ),
+        );
         // ignore: use_build_context_synchronously
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else if (response.statusCode == 400) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: const Color.fromARGB(
+                255, 82, 82, 82), // Definindo o fundo como branco
+            content: Center(
+              child: Text(
+                response.data['error'].toString(),
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 255, 255,
+                      255), // Definindo a cor do texto como preto (opcional)
+                ),
+              ),
+            ),
+          ),
         );
       } else {
         // ignore: use_build_context_synchronously
