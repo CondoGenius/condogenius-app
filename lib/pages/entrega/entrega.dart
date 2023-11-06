@@ -59,10 +59,10 @@ class _EntregaState extends State<Entrega> {
           width: 100,
           child: GestureDetector(
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const HomePage()),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
             },
             child: Image.asset('assets/condogenius.png'),
           ),

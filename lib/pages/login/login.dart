@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_print
-import 'dart:convert';
 import 'package:condo_genius_beta/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -219,6 +218,8 @@ class _LoginState extends State<Login> {
           }, // Adicione o cabeçalho x-access-token aqui
         ),
       );
+
+      print(response.data);
 
       if (response.statusCode == 200) {
         await sharedPreferences.setInt(
