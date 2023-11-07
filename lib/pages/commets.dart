@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:condo_genius_beta/models/comment_model.dart';
 import 'package:condo_genius_beta/models/post_model.dart';
 import 'package:condo_genius_beta/pages/components/menu.dart';
@@ -7,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 Future<List<Comment>> fetchComments(id) async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -19,11 +22,11 @@ Future<List<Comment>> fetchComments(id) async {
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,
       validateStatus: (_) => true,
-      headers: {
-        'x-access-token': token
-      }, // Adicione o cabeçalho x-access-token aqui
+      headers: {'x-access-token': token},
     ),
   );
+
+  print(response.data);
 
   if (response.statusCode == 200) {
     if (response.data != null) {
@@ -44,16 +47,17 @@ class CommentPage extends StatefulWidget {
   final Post post;
 
   @override
-  _CommentPageState createState() => _CommentPageState();
+  CommentPageState createState() => CommentPageState();
 }
 
-class _CommentPageState extends State<CommentPage> {
-  late Future<List<Comment>> comments;
+class CommentPageState extends State<CommentPage> {
+  late Future<List<Comment>> commentsArray;
+  final _commentController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // comments = fetchComments(widget.post.id);
+    commentsArray = fetchComments(widget.post.id);
   }
 
   @override
@@ -122,12 +126,13 @@ class _CommentPageState extends State<CommentPage> {
                       padding: const EdgeInsets.all(15.0),
                       child: Row(
                         children: <Widget>[
-                          const Flexible(
-                            child: TextField(
+                          Flexible(
+                            child: TextFormField(
+                              controller: _commentController,
                               minLines: 2,
                               maxLines: 2,
                               keyboardType: TextInputType.multiline,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                       color: Color.fromARGB(255, 151, 151, 151),
@@ -147,7 +152,9 @@ class _CommentPageState extends State<CommentPage> {
                           IconButton(
                             iconSize: 25.0,
                             icon: const Icon(Icons.edit_note),
-                            onPressed: () {},
+                            onPressed: () {
+                              saveComment();
+                            },
                           ),
                         ],
                       ),
@@ -162,87 +169,138 @@ class _CommentPageState extends State<CommentPage> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: widget.post.comments.isEmpty
-                  ? const Center(
-                      // Exibe a mensagem quando não há comentários
-                      child: Text("Nenhum comentário disponível"),
-                    )
-                  : ListView.builder(
-                      itemCount: widget.post.comments.length,
-                      itemBuilder: (context, index) {
-                        final comment = widget.post.comments[index];
-                        return Row(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    const CircleAvatar(
-                                      radius: 21,
-                                      backgroundColor:
-                                          Color.fromARGB(255, 182, 182, 182),
-                                      child: CircleAvatar(
-                                        radius: 20,
-                                        backgroundImage:
-                                            AssetImage('assets/avatar_m.png'),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Text(
-                                        "${comment.user.name} ${comment.user.lastName}",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
+              child: FutureBuilder<List<Comment>>(
+                future: commentsArray,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => const Login(),
+                      ),
+                    );
+                    return Container();
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                        child: Text('Nenhuma entrega encontrada.'));
+                  } else {
+                    final comments = snapshot.data;
+
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        // Adicione a lógica de atualização aqui
+                        await Future.delayed(
+                          const Duration(seconds: 2),
+                        ); // Simulação de uma tarefa assíncrona de atualização
+                        setState(() {
+                          // Atualize os dados ou recarregue a lista aqui
+                          commentsArray = fetchComments(widget.post.id);
+                        });
+                      },
+                      child: ListView.builder(
+                        itemCount: comments!.length,
+                        itemBuilder: (context, index) {
+                          final comment = comments[index];
+                          return Row(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const CircleAvatar(
+                                        radius: 21,
+                                        backgroundColor:
+                                            Color.fromARGB(255, 182, 182, 182),
+                                        child: CircleAvatar(
+                                          radius: 20,
+                                          backgroundImage:
+                                              AssetImage('assets/avatar_m.png'),
                                         ),
                                       ),
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Text("-"),
-                                    ),
-                                    Text(
-                                      formatDateTime(comment.createdAt.toString()),
-                                      style: const TextStyle(
-                                        color: Color.fromARGB(255, 99, 99, 99),
+                                      Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Text(
+                                          "1dawd",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Container(
+                                      const Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Text("-"),
+                                      ),
+                                      Text(
+                                        formatDateTime(
+                                            comment.createdAt.toString()),
+                                        style: const TextStyle(
+                                          color:
+                                              Color.fromARGB(255, 99, 99, 99),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
                                     padding: const EdgeInsets.all(10.0),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color:
-                                            const Color.fromARGB(255, 99, 99, 99),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10.0),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: const Color.fromARGB(
+                                              255, 99, 99, 99),
+                                        ),
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(8.0),
+                                        ),
                                       ),
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(8.0),
+                                      child: Text(
+                                        comment.content.toString(),
                                       ),
-                                    ),
-                                    child: Text(
-                                      comment.content.toString(),
                                     ),
                                   ),
-                                ),
-                                // ListTile(
-                                //   title: Text(comment.content),
-                                //   subtitle: Text(
-                                //       formatDateTime(comment.createdAt.toString())),
-                                // ),
-                              ],
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
           )
         ],
       ),
     );
+  }
+
+  Future<void> saveComment() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString('token');
+    final int userId = sharedPreferences.getInt('userId')!;
+
+    final response = await http.post(
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/comment'),
+      headers: {
+        'Content-type': 'application/json',
+        'x-access-token': token.toString(),
+      },
+      body: jsonEncode({
+        'user_id': userId,
+        'post_id': widget.post.id,
+        'content': _commentController.text,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // Comment saved successfully, update the comment list
+      setState(() {
+        commentsArray = fetchComments(widget.post.id);
+      });
+    }
   }
 
   String formatDateTime(String dateTimeString) {

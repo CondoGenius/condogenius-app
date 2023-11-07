@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:condo_genius_beta/models/post_model.dart';
 import 'package:condo_genius_beta/pages/commets.dart';
 import 'package:condo_genius_beta/pages/components/menu.dart';
@@ -10,6 +11,7 @@ import 'package:condo_genius_beta/services/notifications_service.dart';
 import 'package:condo_genius_beta/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_polls/flutter_polls.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -33,6 +35,7 @@ Future<void> _initializeFirebaseAndNotifications() async {
 class _HomePageState extends State<HomePage> {
   late AuthService authService;
   late Future<List<Post>> futurePosts;
+  var userId = 0;
 
   bool isLoggedIn = false;
 
@@ -56,6 +59,7 @@ class _HomePageState extends State<HomePage> {
   Future<List<Post>> getHub() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
+    userId = sharedPreferences.getInt('userId')!;
     final dio = Dio();
 
     final response = await dio.get(
@@ -300,8 +304,7 @@ class _HomePageState extends State<HomePage> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) =>
-                                                        CommentPage(
-                                                            post),
+                                                        CommentPage(post),
                                                   ),
                                                 );
                                               } else {
@@ -334,6 +337,16 @@ class _HomePageState extends State<HomePage> {
                             ),
                           );
                         } else {
+                          late bool hasVoted = false;
+                          late int userVotedOptionId = 0;
+
+                          for (var element in post.poll!.options) {
+                            if (element.votes.contains(userId)) {
+                              hasVoted = true;
+                              userVotedOptionId = element.id;
+                            }
+                          }
+
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
@@ -408,23 +421,25 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                           ),
                                           child: Text(
-                                              post.poll!.content.toString()),
+                                              post.title.toString()),
                                         ),
                                       ),
                                       FlutterPolls(
                                         pollId: post.poll!.id.toString(),
                                         votesText: 'Votos',
-                                        hasVoted: true,
-                                        userVotedOptionId: '1',
+                                        hasVoted: hasVoted,
+                                        userVotedOptionId:
+                                            userVotedOptionId.toString(),
                                         createdBy: post.user.name.toString(),
                                         onVoted: (PollOption pollOption,
                                             int newTotalVotes) async {
                                           await Future.delayed(
                                               const Duration(seconds: 1));
-                                          print('dawdawd');
 
                                           /// If HTTP status is success, return true else false
-                                          return false;
+                                          return saveVoto(
+                                              pollOption.id.toString(),
+                                              post.poll!.id.toString());
                                         },
                                         pollTitle: Align(
                                           alignment: Alignment.centerLeft,
@@ -448,7 +463,7 @@ class _HomePageState extends State<HomePage> {
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
-                                                votes: option.percentageOfVotes
+                                                votes: option.quantityOfVotes
                                                     .toInt(),
                                               );
                                               return a;
@@ -469,8 +484,7 @@ class _HomePageState extends State<HomePage> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      CommentPage(
-                                                          post),
+                                                      CommentPage(post),
                                                 ),
                                               );
                                             },
@@ -503,6 +517,55 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Future<bool> saveVoto(String optionId, String enquete) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString('token');
+
+    print({
+      'survey_id': enquete,
+      'poll_option_id': optionId,
+      'user_id': userId,
+    });
+
+    final response = await http.post(
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/vote'),
+      headers: {
+        'Content-type': 'application/json',
+        'x-access-token': token.toString()
+      },
+      body: jsonEncode({
+        'survey_id': enquete,
+        'poll_option_id': optionId,
+        'user_id': userId,
+      }),
+    );
+
+    var body = jsonDecode(response.body);
+
+    if (response.statusCode == 500 || response.statusCode == 400) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color.fromARGB(
+              255, 82, 82, 82), // Definindo o fundo como branco
+          content: Center(
+            child: Text(
+              body['message'],
+              style: const TextStyle(
+                color: Color.fromARGB(255, 255, 255,
+                    255), // Definindo a cor do texto como preto (opcional)
+              ),
+            ),
+          ),
+        ),
+      );
+
+      return false;
+    }
+
+    return true;
   }
 
   String formatDateTime(String dateTimeString) {

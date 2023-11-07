@@ -1,8 +1,10 @@
 // ignore_for_file: avoid_print
+import 'dart:convert';
+
 import 'package:condo_genius_beta/pages/home.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -183,47 +185,36 @@ class _LoginState extends State<Login> {
   void logar() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    const url = 'http://192.168.1.74:5000/gateway/login';
-
-    final retunoLogin = await Dio().post(
-      url,
-      data: {'email': _loginController.text, 'password': _senhaController.text},
-      options: Options(
-          contentType: Headers.jsonContentType,
-          responseType: ResponseType.json,
-          validateStatus: (_) => true),
+    final retunoLogin = await http.post(
+      Uri.parse('http://192.168.1.74:5000/gateway/login'),
+      body: {'email': _loginController.text, 'password': _senhaController.text},
     );
 
+    var bodyLogin = jsonDecode(retunoLogin.body);
+
     if (retunoLogin.statusCode == 200) {
-      String token = retunoLogin.data['token'];
-      String email = retunoLogin.data['email'];
-      int userId = retunoLogin.data['user_id'];
-      int residentId = retunoLogin.data['resident_id'];
+      String token = bodyLogin['token'];
+      String email = bodyLogin['email'];
+      int userId = bodyLogin['user_id'];
+      int residentId = bodyLogin['resident_id'];
       await sharedPreferences.setString('token', token);
       await sharedPreferences.setString('email', email);
       await sharedPreferences.setInt('userId', userId);
       await sharedPreferences.setInt('residentId', residentId);
 
-      final urlDadosUser =
-          'http://192.168.1.74:5000/gateway/residents/api/residents/user/${userId.toString()}';
-
-      final response = await Dio().get(
-        urlDadosUser,
-        options: Options(
-          contentType: Headers.jsonContentType,
-          responseType: ResponseType.json,
-          validateStatus: (_) => true,
-          headers: {
-            'x-access-token': token
-          }, // Adicione o cabeçalho x-access-token aqui
-        ),
+      final response = await http.get(
+        Uri.parse(
+            'http://192.168.1.74:5000/gateway/residents/api/residents/user/${userId.toString()}'),
+        headers: {
+          'x-access-token': token
+        }, // Adicione o cabeçalho x-access-token aqui
       );
 
-      print(response.data);
+      var bodyDataUser = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
         await sharedPreferences.setInt(
-            'residenceId', response.data['residence_id']);
+            'residenceId', bodyDataUser['residence_id']);
       }
 
       //ignore: use_build_context_synchronously

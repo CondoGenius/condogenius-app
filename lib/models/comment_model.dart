@@ -7,7 +7,6 @@ class Comment {
   final String content;
   final String createdAt;
   final String updatedAt;
-  final User user;
 
   Comment({
     required this.id,
@@ -16,7 +15,6 @@ class Comment {
     required this.content,
     required this.createdAt,
     required this.updatedAt,
-    required this.user,
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -27,7 +25,6 @@ class Comment {
       content: json['content'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      user: User.fromJson(json['user']),
     );
   }
 }

@@ -37,7 +37,7 @@ class Post {
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
       user: User.fromJson(json['user']),
-      poll: json['poll'] != null ? Poll.fromJson(json['poll']) : null,
+      poll: json['poll'] != null && json['poll'].isNotEmpty ? Poll.fromJson(json['poll']) : null,
       comments: (json['comments'] as List)
           .map((commentJson) => Comment.fromJson(commentJson))
           .toList(),
