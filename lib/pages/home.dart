@@ -298,25 +298,13 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           TextButton.icon(
                                             onPressed: () {
-                                              if (post.comments.isNotEmpty) {
-                                                // Navegar para a página de comentários apenas se houver comentários
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        CommentPage(post),
-                                                  ),
-                                                );
-                                              } else {
-                                                // Mostrar uma mensagem de aviso se não houver comentários
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                        'Não há comentários disponíveis.'),
-                                                  ),
-                                                );
-                                              }
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CommentPage(post),
+                                                ),
+                                              );
                                             },
                                             style: TextButton.styleFrom(
                                               foregroundColor: Colors.black,
@@ -420,8 +408,7 @@ class _HomePageState extends State<HomePage> {
                                                     8.0) //                 <--- border radius here
                                                 ),
                                           ),
-                                          child: Text(
-                                              post.title.toString()),
+                                          child: Text(post.title.toString()),
                                         ),
                                       ),
                                       FlutterPolls(

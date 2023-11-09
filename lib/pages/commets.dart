@@ -289,11 +289,14 @@ class CommentPageState extends State<CommentPage> {
         'x-access-token': token.toString(),
       },
       body: jsonEncode({
-        'user_id': userId,
-        'post_id': widget.post.id,
-        'content': _commentController.text,
+        "user_id": userId,
+        "post_id": widget.post.id,
+        "content": _commentController.text,
       }),
     );
+
+    print(response.statusCode);
+    print(response.body);
 
     if (response.statusCode == 201) {
       // Comment saved successfully, update the comment list
