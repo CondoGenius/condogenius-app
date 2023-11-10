@@ -5,7 +5,6 @@ import 'package:condo_genius_beta/models/comment_model.dart';
 class Post {
   final int id;
   final int userId;
-  final String title;
   final String content;
   final bool fixed;
   final String createdAt;
@@ -17,7 +16,6 @@ class Post {
   Post({
     required this.id,
     required this.userId,
-    required this.title,
     required this.content,
     required this.fixed,
     required this.createdAt,
@@ -31,7 +29,6 @@ class Post {
     return Post(
       id: json['id'],
       userId: json['user_id'],
-      title: json['title'],
       content: json['content'],
       fixed: json['fixed'],
       createdAt: json['createdAt'],

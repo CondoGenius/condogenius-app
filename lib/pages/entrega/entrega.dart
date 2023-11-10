@@ -20,7 +20,7 @@ Future<List<DeliveryModel>> fetchItems() async {
   final dio = Dio();
 
   final response = await dio.get(
-    'http://192.168.1.74:5000/gateway/api/deliveries',
+    'http://192.168.61.235:5000/gateway/api/deliveries',
     options: Options(
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,

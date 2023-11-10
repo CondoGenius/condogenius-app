@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:condo_genius_beta/models/post_model.dart';
 import 'package:condo_genius_beta/pages/commets.dart';
 import 'package:condo_genius_beta/pages/components/menu.dart';
+import 'package:condo_genius_beta/pages/pollCreate.dart';
 import 'package:condo_genius_beta/services/auth_service.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -35,6 +36,7 @@ Future<void> _initializeFirebaseAndNotifications() async {
 class _HomePageState extends State<HomePage> {
   late AuthService authService;
   late Future<List<Post>> futurePosts;
+  final _contentPost = TextEditingController();
   var userId = 0;
 
   bool isLoggedIn = false;
@@ -63,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     final dio = Dio();
 
     final response = await dio.get(
-      'http://192.168.1.74:5000/gateway/hub_digital/api/post',
+      'http://192.168.61.235:5000/gateway/hub_digital/api/post',
       options: Options(
         contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
@@ -157,12 +159,13 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(15.0),
             child: Row(
               children: <Widget>[
-                const Flexible(
+                Flexible(
                   child: TextField(
+                    controller: _contentPost,
                     minLines: 2,
                     maxLines: 2,
                     keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                             color: Color.fromARGB(255, 151, 151, 151),
@@ -178,11 +181,28 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 15),
-                IconButton(
-                  iconSize: 25.0,
-                  icon: const Icon(Icons.edit_note),
-                  onPressed: () {},
+              ],
+            ),
+          ),
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PollCreate()),
+                    );
+                  },
+                  child: Text('Criar enquete'),
+                ),
+                SizedBox(width: 16), // Espaço entre os botões
+                ElevatedButton(
+                  onPressed: () {
+                    saveAviso();
+                  },
+                  child: Text('Gravar Post'),
                 ),
               ],
             ),
@@ -286,8 +306,7 @@ class _HomePageState extends State<HomePage> {
                                                 color: const Color.fromARGB(
                                                     255, 99, 99, 99)),
                                             borderRadius: const BorderRadius
-                                                    .all(
-                                                Radius.circular(
+                                                .all(Radius.circular(
                                                     8.0) //                 <--- border radius here
                                                 ),
                                           ),
@@ -394,23 +413,6 @@ class _HomePageState extends State<HomePage> {
                                           )
                                         ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(10.0),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: const Color.fromARGB(
-                                                    255, 99, 99, 99)),
-                                            borderRadius: const BorderRadius
-                                                    .all(
-                                                Radius.circular(
-                                                    8.0) //                 <--- border radius here
-                                                ),
-                                          ),
-                                          child: Text(post.title.toString()),
-                                        ),
-                                      ),
                                       FlutterPolls(
                                         pollId: post.poll!.id.toString(),
                                         votesText: 'Votos',
@@ -428,13 +430,15 @@ class _HomePageState extends State<HomePage> {
                                               pollOption.id.toString(),
                                               post.poll!.id.toString());
                                         },
-                                        pollTitle: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            post.title.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
+                                        pollTitle: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Align(
+                                            child: Text(
+                                              post.poll!.content.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -506,6 +510,51 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> saveAviso() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString('token');
+    final int userId = sharedPreferences.getInt('userId')!;
+
+    final response = await http.post(
+      Uri.parse('http://192.168.61.235:5000/gateway/hub_digital/api/post'),
+      headers: {
+        'Content-type': 'application/json',
+        'x-access-token': token.toString()
+      },
+      body: jsonEncode({
+        'content': _contentPost.text,
+        'user_id': userId,
+        'fixed': 'true',
+      }),
+    );
+
+    var body = jsonDecode(response.body);
+
+    if (response.statusCode == 201) {
+      setState(() {
+        futurePosts = getHub();
+      });
+
+      _contentPost.clear();
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color.fromARGB(
+              255, 40, 112, 194), // Definindo o fundo como branco
+          content: Center(
+            child: Text(
+              body['message'],
+              style: const TextStyle(
+                color: Color.fromARGB(255, 255, 255,
+                    255), // Definindo a cor do texto como preto (opcional)
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
   Future<bool> saveVoto(String optionId, String enquete) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
@@ -517,7 +566,7 @@ class _HomePageState extends State<HomePage> {
     });
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/vote'),
+      Uri.parse('http://192.168.61.235:5000/gateway/hub_digital/api/vote'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()

@@ -221,7 +221,7 @@ class _RegisterState extends State<Register> {
   }
 
   void logar() async {
-    const url = 'http://192.168.1.74:5000/gateway/user/register';
+    const url = 'http://192.168.61.235:5000/gateway/user/register';
     final dio = Dio();
 
     if (_senhaController.text != _confirController.text) {

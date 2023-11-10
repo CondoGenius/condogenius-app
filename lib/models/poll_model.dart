@@ -2,7 +2,7 @@ import 'package:condo_genius_beta/models/poll_options_model.dart';
 
 class Poll {
   final int id;
-  final String content;
+  final String content; 
   final List<PollOption> options;
 
   Poll({

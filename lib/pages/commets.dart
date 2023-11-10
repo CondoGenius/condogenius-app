@@ -17,7 +17,7 @@ Future<List<Comment>> fetchComments(id) async {
   final dio = Dio();
 
   final response = await dio.get(
-    'http://192.168.1.74:5000/gateway/hub_digital/api/comment/$id',
+    'http://192.168.61.235:5000/gateway/hub_digital/api/comment/$id',
     options: Options(
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,
@@ -202,67 +202,76 @@ class CommentPageState extends State<CommentPage> {
                         itemCount: comments!.length,
                         itemBuilder: (context, index) {
                           final comment = comments[index];
-                          return Row(
-                            children: [
-                              Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 21,
-                                        backgroundColor:
-                                            Color.fromARGB(255, 182, 182, 182),
-                                        child: CircleAvatar(
-                                          radius: 20,
-                                          backgroundImage:
-                                              AssetImage('assets/avatar_m.png'),
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              bottom: 20,
+                            ),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 7),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: kElevationToShadow[2],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const CircleAvatar(
+                                              radius: 21,
+                                              backgroundColor: Color.fromARGB(
+                                                  255, 182, 182, 182),
+                                              child: CircleAvatar(
+                                                radius: 20,
+                                                backgroundImage: AssetImage(
+                                                    'assets/avatar_m.png'),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(10),
+                                              child: Text(
+                                                '${comment.user.name} ${comment.user.lastName}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Text(
-                                          "1dawd",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
+                                        Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Container(
+                                            padding:
+                                                const EdgeInsets.all(10.0),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: const Color.fromARGB(
+                                                    255, 99, 99, 99),
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                Radius.circular(8.0),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              comment.content.toString(),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      const Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: Text("-"),
-                                      ),
-                                      Text(
-                                        formatDateTime(
-                                            comment.createdAt.toString()),
-                                        style: const TextStyle(
-                                          color:
-                                              Color.fromARGB(255, 99, 99, 99),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(10.0),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: const Color.fromARGB(
-                                              255, 99, 99, 99),
-                                        ),
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(8.0),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        comment.content.toString(),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
-                            ],
+                            ),
                           );
                         },
                       ),
@@ -283,7 +292,7 @@ class CommentPageState extends State<CommentPage> {
     final int userId = sharedPreferences.getInt('userId')!;
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/comment'),
+      Uri.parse('http://192.168.61.235:5000/gateway/hub_digital/api/comment'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString(),
