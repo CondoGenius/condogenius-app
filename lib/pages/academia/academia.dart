@@ -181,7 +181,7 @@ class _AcademiaState extends State<Academia> {
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
     final dio = Dio();
-    const url = 'http://192.168.61.235:5000/gateway/api/checks/resident/';
+    const url = 'http://192.168.1.74:5000/gateway/api/checks/resident/';
 
     final response = await dio.get(
       '$url$residentId',
@@ -206,7 +206,7 @@ class _AcademiaState extends State<Academia> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
-    const url = 'http://192.168.61.235:5000/gateway/api/checks';
+    const url = 'http://192.168.1.74:5000/gateway/api/checks';
 
     final response = await Dio().delete(
       url,
@@ -233,7 +233,7 @@ class _AcademiaState extends State<Academia> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
-    const url = 'http://192.168.61.235:5000/gateway/api/checks';
+    const url = 'http://192.168.1.74:5000/gateway/api/checks';
 
     final response = await Dio().post(
       url,

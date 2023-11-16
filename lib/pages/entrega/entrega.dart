@@ -17,10 +17,11 @@ class Entrega extends StatefulWidget {
 Future<List<DeliveryModel>> fetchItems() async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   final String? token = sharedPreferences.getString('token');
+  final int? residenceId = sharedPreferences.getInt('residenceId');
   final dio = Dio();
 
   final response = await dio.get(
-    'http://192.168.61.235:5000/gateway/api/deliveries',
+    'http://192.168.1.74:5000/gateway/api/deliveries/residence/$residenceId',
     options: Options(
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,

@@ -148,7 +148,7 @@ class _DenunciasState extends State<Denuncias> {
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
     final int? residenceId = sharedPreferences.getInt('residenceId');
-    const url = 'http://192.168.61.235:5000/gateway/api/complaints';
+    const url = 'http://192.168.1.74:5000/gateway/api/complaints';
     // ignore: use_build_context_synchronously
     final dioErrorHandler = DioErrorHandler(context);
 

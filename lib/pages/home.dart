@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   late Future<List<Post>> futurePosts;
   final _contentPost = TextEditingController();
   var userId = 0;
-
+  bool _hasError = false;
   bool isLoggedIn = false;
 
   @override
@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     final dio = Dio();
 
     final response = await dio.get(
-      'http://192.168.61.235:5000/gateway/hub_digital/api/post',
+      'http://192.168.1.74:5000/gateway/hub_digital/api/post',
       options: Options(
         contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
@@ -165,19 +165,28 @@ class _HomePageState extends State<HomePage> {
                     minLines: 2,
                     maxLines: 2,
                     keyboardType: TextInputType.multiline,
-                    decoration: const InputDecoration(
-                      focusedBorder: OutlineInputBorder(
+                    decoration: InputDecoration(
+                      focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: Color.fromARGB(255, 151, 151, 151),
-                            width: 2.0),
+                          color: Color.fromARGB(255, 151, 151, 151),
+                          width: 2.0,
+                        ),
                       ),
-                      enabledBorder: OutlineInputBorder(
+                      enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: Color.fromARGB(255, 151, 151, 151),
-                            width: 2.0),
+                          color: Color.fromARGB(255, 151, 151, 151),
+                          width: 2.0,
+                        ),
+                      ),
+                      errorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red, // Cor da borda de erro
+                          width: 2.0,
+                        ),
                       ),
                       filled: false,
                       hintText: 'Escreva um aviso..',
+                      errorText: _hasError ? 'Campo obrigatório!' : null,
                     ),
                   ),
                 ),
@@ -192,17 +201,27 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const PollCreate()),
+                      MaterialPageRoute(
+                          builder: (context) => const PollCreate()),
                     );
                   },
-                  child: Text('Criar enquete'),
+                  child: const Text('Criar enquete'),
                 ),
-                SizedBox(width: 16), // Espaço entre os botões
+                const SizedBox(width: 16), // Espaço entre os botões
                 ElevatedButton(
                   onPressed: () {
-                    saveAviso();
+                    if (_contentPost.text.isEmpty) {
+                      setState(() {
+                        _hasError = true;
+                      });
+                    } else {
+                      saveAviso();
+                      setState(() {
+                        _hasError = false;
+                      });
+                    }
                   },
-                  child: Text('Gravar Post'),
+                  child: const Text('Gravar Post'),
                 ),
               ],
             ),
@@ -516,7 +535,7 @@ class _HomePageState extends State<HomePage> {
     final int userId = sharedPreferences.getInt('userId')!;
 
     final response = await http.post(
-      Uri.parse('http://192.168.61.235:5000/gateway/hub_digital/api/post'),
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/post'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()
@@ -566,7 +585,7 @@ class _HomePageState extends State<HomePage> {
     });
 
     final response = await http.post(
-      Uri.parse('http://192.168.61.235:5000/gateway/hub_digital/api/vote'),
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/vote'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()

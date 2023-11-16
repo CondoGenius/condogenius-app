@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 import 'package:condo_genius_beta/pages/home.dart';
+import 'package:condo_genius_beta/pages/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -221,7 +222,7 @@ class _RegisterState extends State<Register> {
   }
 
   void logar() async {
-    const url = 'http://192.168.61.235:5000/gateway/user/register';
+    const url = 'http://192.168.1.74:5000/gateway/user/register';
     final dio = Dio();
 
     if (_senhaController.text != _confirController.text) {
@@ -277,7 +278,7 @@ class _RegisterState extends State<Register> {
         // ignore: use_build_context_synchronously
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const Login()),
         );
       } else if (response.statusCode == 400) {
         // ignore: use_build_context_synchronously

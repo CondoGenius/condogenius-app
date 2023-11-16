@@ -17,7 +17,7 @@ Future<List<Comment>> fetchComments(id) async {
   final dio = Dio();
 
   final response = await dio.get(
-    'http://192.168.61.235:5000/gateway/hub_digital/api/comment/$id',
+    'http://192.168.1.74:5000/gateway/hub_digital/api/comment/$id',
     options: Options(
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,
@@ -234,8 +234,7 @@ class CommentPageState extends State<CommentPage> {
                                               ),
                                             ),
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10),
+                                              padding: const EdgeInsets.all(10),
                                               child: Text(
                                                 '${comment.user.name} ${comment.user.lastName}',
                                                 style: const TextStyle(
@@ -244,13 +243,24 @@ class CommentPageState extends State<CommentPage> {
                                                 ),
                                               ),
                                             ),
+                                            const Padding(
+                                              padding: EdgeInsets.all(
+                                                  10), //apply padding to all four sides
+                                              child: Text("-"),
+                                            ),
+                                            Text(
+                                              formatDateTime(
+                                                  comment.createdAt.toString()),
+                                              style: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 99, 99, 99)),
+                                            )
                                           ],
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.all(10.0),
                                           child: Container(
-                                            padding:
-                                                const EdgeInsets.all(10.0),
+                                            padding: const EdgeInsets.all(10.0),
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                 color: const Color.fromARGB(
@@ -292,7 +302,7 @@ class CommentPageState extends State<CommentPage> {
     final int userId = sharedPreferences.getInt('userId')!;
 
     final response = await http.post(
-      Uri.parse('http://192.168.61.235:5000/gateway/hub_digital/api/comment'),
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/comment'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString(),

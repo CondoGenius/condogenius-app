@@ -1,11 +1,11 @@
-import 'package:condo_genius_beta/models/delivery_model.dart';
+import 'dart:convert';
+
 import 'package:condo_genius_beta/pages/components/menu.dart';
 import 'package:condo_genius_beta/pages/home.dart';
 import 'package:condo_genius_beta/pages/login/login.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class PollCreate extends StatefulWidget {
   const PollCreate({super.key});
@@ -22,8 +22,49 @@ class _PollCreateState extends State<PollCreate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: const Menu(),
       appBar: AppBar(
-        title: Text('Tela de Opções'),
+        title: SizedBox(
+          width: 100,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+            child: Image.asset('assets/condogenius.png'),
+          ),
+        ),
+        toolbarHeight: 90,
+        centerTitle: false,
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color.fromARGB(255, 235, 235, 235),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              iconSize: 25,
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Color.fromRGBO(12, 192, 223, 1),
+              ),
+              onPressed: () => {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                )
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu,
+                  color: Color.fromARGB(255, 90, 90, 90)),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
+          ),
+        ],
       ),
       body: ListView(
         children: [
@@ -81,14 +122,30 @@ class _PollCreateState extends State<PollCreate> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    // Imprima os valores dos TextFields
-                    optionValues = [];
-                    for (var textField in optionTextFields) {
-                      optionValues.add(textField.controller.text);
+                    var isEmpty = verifyEmptyFields(optionTextFields);
+
+                    if (isEmpty || optionTextFields.isEmpty) {
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: Color.fromARGB(
+                              255, 82, 82, 82), // Definindo o fundo como branco
+                          content: Center(
+                            child: Text(
+                              'Preencha todos os campos!',
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 255, 255,
+                                    255), // Definindo a cor do texto como preto (opcional)
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    } else {
+                       savePoll();
                     }
-                    print('Lista de Opções: $optionValues');
                   },
-                  child: const Text('Obter Valores'),
+                  child: const Text('SALVAR'),
                 ),
               ],
             ),
@@ -96,6 +153,83 @@ class _PollCreateState extends State<PollCreate> {
         ],
       ),
     );
+  }
+
+  bool verifyEmptyFields(List<OptionTextField> optionTextFields) {
+    bool isEmpty = false;
+
+    for (var textField in optionTextFields) {
+      if (textField.controller.text == '') {
+        isEmpty = true;
+      }
+    }
+
+    return isEmpty;
+  }
+
+  Future<void> savePoll() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString('token');
+    final int userId = sharedPreferences.getInt('userId')!;
+
+    optionValues = [];
+
+    for (var textField in optionTextFields) {
+      optionValues.add(textField.controller.text);
+    }
+
+    final response = await http.post(
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/poll'),
+      headers: {
+        'Content-type': 'application/json',
+        'x-access-token': token.toString(),
+      },
+      body: jsonEncode({
+        "content": titleController.text,
+        "user_id": userId,
+        "options": optionValues
+      }),
+    );
+
+    var body = jsonDecode(response.body);
+
+    if (response.statusCode == 201) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color.fromARGB(
+              255, 40, 112, 194), // Definindo o fundo como branco
+          content: Center(
+            child: Text(
+              body['message'].toString(),
+              style: const TextStyle(
+                color: Color.fromARGB(255, 255, 255,
+                    255), // Definindo a cor do texto como preto (opcional)
+              ),
+            ),
+          ),
+        ),
+      );
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushReplacementNamed('/Home');
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor:
+              Color.fromARGB(255, 82, 82, 82), // Definindo o fundo como branco
+          content: Center(
+            child: Text(
+              'Erro ao criar a enquete!',
+              style: TextStyle(
+                color: Color.fromARGB(255, 255, 255,
+                    255), // Definindo a cor do texto como preto (opcional)
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
 

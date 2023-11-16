@@ -186,7 +186,7 @@ class _LoginState extends State<Login> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     final retunoLogin = await http.post(
-      Uri.parse('http://192.168.61.235:5000/gateway/login'),
+      Uri.parse('http://192.168.1.74:5000/gateway/login'),
       body: {'email': _loginController.text, 'password': _senhaController.text},
     );
 
@@ -204,7 +204,7 @@ class _LoginState extends State<Login> {
 
       final response = await http.get(
         Uri.parse(
-            'http://192.168.61.235:5000/gateway/residents/api/residents/user/${userId.toString()}'),
+            'http://192.168.1.74:5000/gateway/residents/api/residents/user/${userId.toString()}'),
         headers: {
           'x-access-token': token
         }, // Adicione o cabeçalho x-access-token aqui
