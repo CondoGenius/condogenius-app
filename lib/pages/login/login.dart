@@ -186,7 +186,7 @@ class _LoginState extends State<Login> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     final retunoLogin = await http.post(
-      Uri.parse('http://192.168.1.74:5000/gateway/login'),
+      Uri.parse('http://192.168.182.235:5000/gateway/login'),
       body: {'email': _loginController.text, 'password': _senhaController.text},
     );
 
@@ -204,7 +204,7 @@ class _LoginState extends State<Login> {
 
       final response = await http.get(
         Uri.parse(
-            'http://192.168.1.74:5000/gateway/residents/api/residents/user/${userId.toString()}'),
+            'http://192.168.182.235:5000/gateway/residents/api/residents/user/${userId.toString()}'),
         headers: {
           'x-access-token': token
         }, // Adicione o cabeçalho x-access-token aqui
@@ -212,9 +212,13 @@ class _LoginState extends State<Login> {
 
       var bodyDataUser = jsonDecode(response.body);
 
+      print(bodyDataUser);
+
       if (response.statusCode == 200) {
         await sharedPreferences.setInt(
             'residenceId', bodyDataUser['residence_id']);
+        await sharedPreferences.setString(
+            'name', bodyDataUser['name'] + ' ' + bodyDataUser['last_name']);
       }
 
       //ignore: use_build_context_synchronously

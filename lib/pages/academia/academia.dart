@@ -13,7 +13,7 @@ class Academia extends StatefulWidget {
 
 class _AcademiaState extends State<Academia> {
   late Future<String?> _checkin;
-
+  
   @override
   void initState() {
     super.initState();
@@ -87,7 +87,7 @@ class _AcademiaState extends State<Academia> {
                           const Padding(
                             padding: EdgeInsets.all(30),
                             child: Text(
-                              'Academia',
+                              'Check-in/Check-out',
                               style: TextStyle(
                                 decoration: TextDecoration.underline,
                                 fontWeight: FontWeight.bold,
@@ -123,7 +123,7 @@ class _AcademiaState extends State<Academia> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8.0),
                                     child: Image.asset(
-                                      'assets/avatar_m.png',
+                                      'assets/garoto.png',
                                       width: 150,
                                       height: 150,
                                     ),
@@ -181,7 +181,7 @@ class _AcademiaState extends State<Academia> {
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
     final dio = Dio();
-    const url = 'http://192.168.1.74:5000/gateway/api/checks/resident/';
+    const url = 'http://192.168.182.235:5000/gateway/api/checks/resident/';
 
     final response = await dio.get(
       '$url$residentId',
@@ -206,7 +206,7 @@ class _AcademiaState extends State<Academia> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
-    const url = 'http://192.168.1.74:5000/gateway/api/checks';
+    const url = 'http://192.168.182.235:5000/gateway/api/checks';
 
     final response = await Dio().delete(
       url,
@@ -233,7 +233,7 @@ class _AcademiaState extends State<Academia> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
-    const url = 'http://192.168.1.74:5000/gateway/api/checks';
+    const url = 'http://192.168.182.235:5000/gateway/api/checks';
 
     final response = await Dio().post(
       url,

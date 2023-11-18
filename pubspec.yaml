@@ -74,6 +74,8 @@ flutter:
     - assets/condogenius.png
     - assets/avatar_h.png
     - assets/avatar_m.png
+    - assets/avatar.png
+    - assets/garoto.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

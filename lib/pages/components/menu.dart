@@ -45,7 +45,7 @@ class Menu extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.home),
-            title: const Text('INÍCIO'), // for Right
+            title: const Text('Hub Digital'), // for Right
             onTap: () {
               Navigator.push(
                 context,
@@ -59,8 +59,10 @@ class Menu extends StatelessWidget {
             ), // for Left
           ),
           ListTile(
-            leading: const Icon(Icons.fitness_center),
-            title: const Text('ACADEMIA'), // for Right
+            leading: const Icon(
+              Icons.task_alt,
+            ),
+            title: const Text('Check-in/Check-out'), // for Right
             onTap: () {
               Navigator.push(
                 context,
@@ -74,8 +76,10 @@ class Menu extends StatelessWidget {
             ), // for Left
           ),
           ListTile(
-            leading: const Icon(Icons.markunread_mailbox),
-            title: const Text('ENTREGAS'), // for Right
+            leading: const Icon(
+              Icons.local_shipping,
+            ),
+            title: const Text('Entregas'), // for Right
             onTap: () {
               Navigator.push(
                 context,
@@ -90,7 +94,7 @@ class Menu extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.report_gmailerrorred),
-            title: const Text('RECLAMAÇÃO'), // for Right
+            title: const Text('Reclamações'), // for Right
             onTap: () {
               Navigator.push(
                 context,
@@ -108,7 +112,7 @@ class Menu extends StatelessWidget {
               Icons.arrow_back,
               color: Colors.red, // Defina a cor do ícone aqui
             ),
-            title: const Text('SAIR'), // for Right
+            title: const Text('Sair'), // for Right
             onTap: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.remove('token');

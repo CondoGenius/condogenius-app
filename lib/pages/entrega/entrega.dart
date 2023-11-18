@@ -21,7 +21,7 @@ Future<List<DeliveryModel>> fetchItems() async {
   final dio = Dio();
 
   final response = await dio.get(
-    'http://192.168.1.74:5000/gateway/api/deliveries/residence/$residenceId',
+    'http://192.168.182.235:5000/gateway/api/deliveries/residence/$residenceId',
     options: Options(
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,
@@ -166,23 +166,23 @@ class _EntregaState extends State<Entrega> {
                               padding: const EdgeInsets.all(20.0),
                               child: Column(
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .center, // Define a centralização dos elementos na linha
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(
-                                            10), // Aplicar preenchimento a todos os lados
-                                        child: Text(
-                                          delivery.status,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment
+                                  //       .center, // Define a centralização dos elementos na linha
+                                  //   children: [
+                                  //     Padding(
+                                  //       padding: const EdgeInsets.all(
+                                  //           10), // Aplicar preenchimento a todos os lados
+                                  //       child: Text(
+                                  //         delivery.status,
+                                  //         style: const TextStyle(
+                                  //           fontWeight: FontWeight.bold,
+                                  //           fontSize: 15,
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
                                   Column(
                                     children: [
                                       Align(
@@ -190,46 +190,65 @@ class _EntregaState extends State<Entrega> {
                                         child: Row(
                                           children: [
                                             const Text(
-                                              'Data: ',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              formatDateTime(
-                                                  delivery.delivered_at),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Row(
-                                          children: [
-                                            const Text(
-                                              'Residência: ',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              delivery.residence_id.toString(),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Row(
-                                          children: [
-                                            const Text(
-                                              'Colaborador: ',
+                                              'Porteiro: ',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                             Text(
                                               '${delivery.admin_name} ${delivery.admin_last_name}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          children: [
+                                            const Text(
+                                              'Recebida: ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              formatDateTime(
+                                                delivery.received_at,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          children: [
+                                            const Text(
+                                              'Entregue: ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              formatDateTime(
+                                                delivery.delivered_at,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Row(
+                                          children: [
+                                            const Text(
+                                              'Status: ',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              delivery.status,
                                             ),
                                           ],
                                         ),

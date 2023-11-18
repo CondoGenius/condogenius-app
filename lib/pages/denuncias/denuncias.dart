@@ -113,26 +113,24 @@ class _DenunciasState extends State<Denuncias> {
                                       width: 2.0),
                                 ),
                                 filled: false,
-                                hintText: 'Escreva aqui uma denúncia..',
+                                hintText:
+                                    'Descreva em detalhes o motivo da sua reclamação incluindo o nome ou casa do morador reclamado',
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 15),
-                          IconButton(
-                            iconSize: 30.0,
-                            icon: const Icon(Icons.send),
-                            onPressed: () {
-                              saveDenuncia();
-                            },
                           ),
                         ],
                       ),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Text(
-                          '*O Canal é anônimo e suas denúncias serão avaliadas de acordo com a severidade das alegações, para mais informações de segurança consulte a lista de números utilitários.'),
-                    )
+                    ElevatedButton(
+                      onPressed: () {
+                        saveDenuncia();
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color(0xFF2ABBAD)),
+                      ),
+                      child: const Text('Enviar Reclamação'),
+                    ),
                   ],
                 ),
               ],
@@ -148,10 +146,9 @@ class _DenunciasState extends State<Denuncias> {
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
     final int? residenceId = sharedPreferences.getInt('residenceId');
-    const url = 'http://192.168.1.74:5000/gateway/api/complaints';
+    const url = 'http://192.168.182.235:5000/gateway/api/complaints';
     // ignore: use_build_context_synchronously
     final dioErrorHandler = DioErrorHandler(context);
-
 
     await dioErrorHandler.handleDioError(() async {
       final response = await Dio().post(

@@ -103,7 +103,7 @@ class _PerfilState extends State<Perfil> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: Image.asset(
-                          'assets/avatar_h.png',
+                          'assets/avatar.png',
                           width: 200,
                           height: 200,
                         ),

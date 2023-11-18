@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     final dio = Dio();
 
     final response = await dio.get(
-      'http://192.168.1.74:5000/gateway/hub_digital/api/post',
+      'http://192.168.182.235:5000/gateway/hub_digital/api/post',
       options: Options(
         contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
           const Padding(
             padding: EdgeInsets.all(30),
             child: Text(
-              'HUB Digital',
+              'Hub Digital',
               style: TextStyle(
                 decoration: TextDecoration.underline,
                 fontWeight: FontWeight.bold,
@@ -162,8 +162,8 @@ class _HomePageState extends State<HomePage> {
                 Flexible(
                   child: TextField(
                     controller: _contentPost,
-                    minLines: 2,
-                    maxLines: 2,
+                    minLines: 4,
+                    maxLines: 4,
                     keyboardType: TextInputType.multiline,
                     decoration: InputDecoration(
                       focusedBorder: const OutlineInputBorder(
@@ -185,7 +185,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       filled: false,
-                      hintText: 'Escreva um aviso..',
+                      hintText:
+                          'Compartilhe avisos, notícias e informações relevantes à comunidade do condomínio',
                       errorText: _hasError ? 'Campo obrigatório!' : null,
                     ),
                   ),
@@ -195,18 +196,7 @@ class _HomePageState extends State<HomePage> {
           ),
           Center(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const PollCreate()),
-                    );
-                  },
-                  child: const Text('Criar enquete'),
-                ),
                 const SizedBox(width: 16), // Espaço entre os botões
                 ElevatedButton(
                   onPressed: () {
@@ -221,7 +211,11 @@ class _HomePageState extends State<HomePage> {
                       });
                     }
                   },
-                  child: const Text('Gravar Post'),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFF2ABBAD)),
+                  ),
+                  child: const Text('Compartilhar Publicação'),
                 ),
               ],
             ),
@@ -282,14 +276,10 @@ class _HomePageState extends State<HomePage> {
                                       Row(
                                         children: [
                                           const CircleAvatar(
-                                            radius: 21,
-                                            backgroundColor: Color.fromARGB(
-                                                255, 182, 182, 182),
-                                            child: CircleAvatar(
-                                              radius: 20,
-                                              backgroundImage: AssetImage(
-                                                  'assets/avatar_m.png'),
-                                            ),
+                                            radius: 15,
+                                            backgroundColor: Colors.transparent,
+                                            backgroundImage:
+                                                AssetImage('assets/avatar.png'),
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.all(
@@ -307,13 +297,30 @@ class _HomePageState extends State<HomePage> {
                                                 10), //apply padding to all four sides
                                             child: Text("-"),
                                           ),
-                                          Text(
-                                            formatDateTime(
+                                          FutureBuilder<String>(
+                                            future: convertDateToDias(
                                                 post.createdAt.toString()),
-                                            style: const TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 99, 99, 99)),
-                                          )
+                                            builder: (context, snapshot) {
+                                              return Text(
+                                                snapshot.data.toString(),
+                                                style: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 99, 99, 99),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          const Spacer(),
+                                          if (post.fixed)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 30.0),
+                                              child: Icon(
+                                                Icons.push_pin,
+                                                color: Colors.black
+                                                    .withOpacity(0.4),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                       Padding(
@@ -398,14 +405,10 @@ class _HomePageState extends State<HomePage> {
                                       Row(
                                         children: [
                                           const CircleAvatar(
-                                            radius: 21,
-                                            backgroundColor: Color.fromARGB(
-                                                255, 182, 182, 182),
-                                            child: CircleAvatar(
-                                              radius: 20,
-                                              backgroundImage: AssetImage(
-                                                  'assets/avatar_m.png'),
-                                            ),
+                                            radius: 15,
+                                            backgroundColor: Colors.transparent,
+                                            backgroundImage:
+                                                AssetImage('assets/avatar.png'),
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.all(
@@ -423,13 +426,30 @@ class _HomePageState extends State<HomePage> {
                                                 10), //apply padding to all four sides
                                             child: Text("-"),
                                           ),
-                                          Text(
-                                            formatDateTime(
+                                          FutureBuilder<String>(
+                                            future: convertDateToDias(
                                                 post.createdAt.toString()),
-                                            style: const TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 99, 99, 99)),
-                                          )
+                                            builder: (context, snapshot) {
+                                              return Text(
+                                                snapshot.data.toString(),
+                                                style: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 99, 99, 99),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          const Spacer(),
+                                          if (post.fixed)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 30.0),
+                                              child: Icon(
+                                                Icons.push_pin,
+                                                color: Colors.black
+                                                    .withOpacity(0.4),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                       FlutterPolls(
@@ -535,7 +555,7 @@ class _HomePageState extends State<HomePage> {
     final int userId = sharedPreferences.getInt('userId')!;
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/post'),
+      Uri.parse('http://192.168.182.235:5000/gateway/hub_digital/api/post'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()
@@ -574,6 +594,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<String> convertDateToDias(String datetime) async {
+    DateTime data = DateTime.parse(datetime);
+    DateTime dataAtual = DateTime.now();
+
+    // Calcula a diferença em dias
+    Duration diferenca = dataAtual.difference(data);
+    int dias = diferenca.inDays;
+
+    return dias == 0 ? 'hoje' : 'há $dias dias';
+  }
+
   Future<bool> saveVoto(String optionId, String enquete) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
@@ -585,7 +616,7 @@ class _HomePageState extends State<HomePage> {
     });
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/vote'),
+      Uri.parse('http://192.168.182.235:5000/gateway/hub_digital/api/vote'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()

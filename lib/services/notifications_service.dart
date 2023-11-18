@@ -13,7 +13,7 @@ class FirebaseApi {
     await _firebaseMessaging.requestPermission();
     final fcmToken = await _firebaseMessaging.getToken();
 
-    const url = 'http://192.168.1.74:5000/gateway/residents/api/residents/';
+    const url = 'http://192.168.182.235:5000/gateway/residents/api/residents/';
 
     if (residentId != null) {
       final response = await Dio().put(
