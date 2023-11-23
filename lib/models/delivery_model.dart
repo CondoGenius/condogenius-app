@@ -1,7 +1,7 @@
 class DeliveryModel {
   final int id;
   final String status;
-  final String delivered_at;
+  final String? delivered_at;
   final String received_at;
   final String created_at;
   final String updated_at;

@@ -26,7 +26,7 @@ class _LoginState extends State<Login> {
     double topPaddingPercentage = 10; // 10% da altura da tela
     double leftPaddingPercentage = 5; // 5% da largura da tela
     double rightPaddingPercentage = 5; // 5% da largura da tela
-    double bottomPaddingPercentage = 15; // 15% da altura da tela
+    double bottomPaddingPercentage = 10; // 15% da altura da tela
 
     EdgeInsetsGeometry padding = EdgeInsets.only(
       top: screenHeight * (topPaddingPercentage / 100),
@@ -161,17 +161,17 @@ class _LoginState extends State<Login> {
                       }
                       FocusScope.of(context).unfocus();
                     },
-                    child: const Text('LOGIN'),
+                    child: const Text('ENTRAR'),
                   ),
-                  const SizedBox(height: 70),
-                  InkWell(
-                    onTap: () {
-                      //navegar para a pagina register
-                      Navigator.pushNamed(context, '/Register');
-                    },
-                    child: const Text("Cadastre-se",
-                        style: TextStyle(color: Colors.black)),
-                  ),
+                  // const SizedBox(height: 70),
+                  // InkWell(
+                  //   onTap: () {
+                  //     //navegar para a pagina register
+                  //     Navigator.pushNamed(context, '/Register');
+                  //   },
+                  //   child: const Text("Cadastre-se",
+                  //       style: TextStyle(color: Colors.black)),
+                  // ),
                 ],
               ),
             ),
@@ -186,7 +186,7 @@ class _LoginState extends State<Login> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     final retunoLogin = await http.post(
-      Uri.parse('http://192.168.182.235:5000/gateway/login'),
+      Uri.parse('http://192.168.1.74:5000/gateway/login'),
       body: {'email': _loginController.text, 'password': _senhaController.text},
     );
 
@@ -204,7 +204,7 @@ class _LoginState extends State<Login> {
 
       final response = await http.get(
         Uri.parse(
-            'http://192.168.182.235:5000/gateway/residents/api/residents/user/${userId.toString()}'),
+            'http://192.168.1.74:5000/gateway/residents/api/residents/user/${userId.toString()}'),
         headers: {
           'x-access-token': token
         }, // Adicione o cabeçalho x-access-token aqui

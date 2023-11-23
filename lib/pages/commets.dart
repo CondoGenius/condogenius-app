@@ -11,37 +11,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-Future<List<Comment>> fetchComments(id) async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  final String? token = sharedPreferences.getString('token');
-  final dio = Dio();
-
-  final response = await dio.get(
-    'http://192.168.182.235:5000/gateway/hub_digital/api/comment/$id',
-    options: Options(
-      contentType: Headers.jsonContentType,
-      responseType: ResponseType.json,
-      validateStatus: (_) => true,
-      headers: {'x-access-token': token},
-    ),
-  );
-
-  print(response.data);
-
-  if (response.statusCode == 200) {
-    if (response.data != null) {
-      final List<dynamic> data = response.data;
-      return data.map((item) => Comment.fromJson(item)).toList();
-    } else {
-      return [];
-    }
-  } else if (response.statusCode == 401) {
-    throw Exception('Login Expirado');
-  } else {
-    throw Exception('Falha ao carregar dados da API');
-  }
-}
-
 class CommentPage extends StatefulWidget {
   const CommentPage(this.post, {Key? key}) : super(key: key);
   final Post post;
@@ -53,6 +22,37 @@ class CommentPage extends StatefulWidget {
 class CommentPageState extends State<CommentPage> {
   late Future<List<Comment>> commentsArray;
   final _commentController = TextEditingController();
+  var userId = 0;
+
+  Future<List<Comment>> fetchComments(id) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString('token');
+    userId = sharedPreferences.getInt('userId')!;
+    final dio = Dio();
+
+    final response = await dio.get(
+      'http://192.168.1.74:5000/gateway/hub_digital/api/comment/$id',
+      options: Options(
+        contentType: Headers.jsonContentType,
+        responseType: ResponseType.json,
+        validateStatus: (_) => true,
+        headers: {'x-access-token': token},
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      if (response.data != null) {
+        final List<dynamic> data = response.data;
+        return data.map((item) => Comment.fromJson(item)).toList();
+      } else {
+        return [];
+      }
+    } else if (response.statusCode == 401) {
+      throw Exception('Login Expirado');
+    } else {
+      throw Exception('Falha ao carregar dados da API');
+    }
+  }
 
   @override
   void initState() {
@@ -183,7 +183,7 @@ class CommentPageState extends State<CommentPage> {
                     return Container();
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
-                        child: Text('Nenhuma entrega encontrada.'));
+                        child: Text('Nenhuma comentário encontrado.'));
                   } else {
                     final comments = snapshot.data;
 
@@ -225,12 +225,13 @@ class CommentPageState extends State<CommentPage> {
                                           children: [
                                             const CircleAvatar(
                                               radius: 15,
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               backgroundImage: AssetImage(
                                                   'assets/avatar.png'),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.all(10),
+                                              padding: const EdgeInsets.all(5),
                                               child: Text(
                                                 '${comment.user.name} ${comment.user.lastName}',
                                                 style: const TextStyle(
@@ -240,8 +241,7 @@ class CommentPageState extends State<CommentPage> {
                                               ),
                                             ),
                                             const Padding(
-                                              padding: EdgeInsets.all(
-                                                  10), //apply padding to all four sides
+                                              padding: EdgeInsets.all(2.0),
                                               child: Text("-"),
                                             ),
                                             Text(
@@ -250,7 +250,19 @@ class CommentPageState extends State<CommentPage> {
                                               style: const TextStyle(
                                                   color: Color.fromARGB(
                                                       255, 99, 99, 99)),
-                                            )
+                                            ),
+                                            const Spacer(),
+                                            if (comment.user.id == userId)
+                                              GestureDetector(
+                                                onTap: () {
+                                                  deleteComment(comment.id);
+                                                },
+                                                child: const Icon(
+                                                  Icons.delete,
+                                                  color: Colors
+                                                      .red, // You can customize the color
+                                                ),
+                                              ),
                                           ],
                                         ),
                                         Padding(
@@ -292,13 +304,52 @@ class CommentPageState extends State<CommentPage> {
     );
   }
 
+  Future<void> deleteComment(int commentID) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString('token');
+
+    final response = await http.delete(
+      Uri.parse(
+          'http://192.168.1.74:5000/gateway/hub_digital/api/comment/$commentID'),
+      headers: {
+        'Content-type': 'application/json',
+        'x-access-token': token.toString(),
+      },
+    );
+
+    var body = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        // Atualize os dados ou recarregue a lista aqui
+        commentsArray = fetchComments(widget.post.id);
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color.fromARGB(
+              255, 40, 112, 194), // Definindo o fundo como branco
+          content: Center(
+            child: Text(
+              body['message'],
+              style: const TextStyle(
+                  color: Color.fromARGB(255, 255, 255,
+                      255) // Definindo a cor do texto como preto (opcional)
+                  ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
   Future<void> saveComment() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
     final int userId = sharedPreferences.getInt('userId')!;
 
     final response = await http.post(
-      Uri.parse('http://192.168.182.235:5000/gateway/hub_digital/api/comment'),
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/comment'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString(),
@@ -310,9 +361,6 @@ class CommentPageState extends State<CommentPage> {
       }),
     );
 
-    print(response.statusCode);
-    print(response.body);
-
     if (response.statusCode == 201) {
       // Comment saved successfully, update the comment list
       setState(() {
@@ -323,7 +371,7 @@ class CommentPageState extends State<CommentPage> {
 
   String formatDateTime(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString);
-    String formattedDate = DateFormat('dd/MM HH:mm').format(dateTime);
+    String formattedDate = DateFormat("dd/MM 'às' HH:mm").format(dateTime);
     return formattedDate;
   }
 }

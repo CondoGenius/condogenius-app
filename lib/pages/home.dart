@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:condo_genius_beta/models/post_model.dart';
 import 'package:condo_genius_beta/pages/commets.dart';
 import 'package:condo_genius_beta/pages/components/menu.dart';
-import 'package:condo_genius_beta/pages/pollCreate.dart';
 import 'package:condo_genius_beta/services/auth_service.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -65,7 +64,7 @@ class _HomePageState extends State<HomePage> {
     final dio = Dio();
 
     final response = await dio.get(
-      'http://192.168.182.235:5000/gateway/hub_digital/api/post',
+      'http://192.168.1.74:5000/gateway/hub_digital/api/post',
       options: Options(
         contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
@@ -99,10 +98,10 @@ class _HomePageState extends State<HomePage> {
           width: 100,
           child: GestureDetector(
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const HomePage()),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
             },
             child: Image.asset('assets/condogenius.png'),
           ),
@@ -292,11 +291,6 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                          const Padding(
-                                            padding: EdgeInsets.all(
-                                                10), //apply padding to all four sides
-                                            child: Text("-"),
-                                          ),
                                           FutureBuilder<String>(
                                             future: convertDateToDias(
                                                 post.createdAt.toString()),
@@ -314,11 +308,24 @@ class _HomePageState extends State<HomePage> {
                                           if (post.fixed)
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  right: 30.0),
+                                                  right: 10.0),
                                               child: Icon(
                                                 Icons.push_pin,
                                                 color: Colors.black
                                                     .withOpacity(0.4),
+                                              ),
+                                            ),
+                                          if (post.userId == userId)
+                                            GestureDetector(
+                                              onTap: () {
+                                                // Add your delete post logic here
+                                                // For example, you can call a function to delete the post
+                                                deletePost(post.id);
+                                              },
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: Colors.black
+                                                    .withOpacity(0.4),// You can customize the color
                                               ),
                                             ),
                                         ],
@@ -421,11 +428,6 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                          const Padding(
-                                            padding: EdgeInsets.all(
-                                                10), //apply padding to all four sides
-                                            child: Text("-"),
-                                          ),
                                           FutureBuilder<String>(
                                             future: convertDateToDias(
                                                 post.createdAt.toString()),
@@ -462,9 +464,8 @@ class _HomePageState extends State<HomePage> {
                                         onVoted: (PollOption pollOption,
                                             int newTotalVotes) async {
                                           await Future.delayed(
-                                              const Duration(seconds: 1));
-
-                                          /// If HTTP status is success, return true else false
+                                            const Duration(seconds: 1),
+                                          );
                                           return saveVoto(
                                               pollOption.id.toString(),
                                               post.poll!.id.toString());
@@ -484,7 +485,7 @@ class _HomePageState extends State<HomePage> {
                                         pollOptions: List<PollOption>.from(
                                           post.poll!.options.map(
                                             (option) {
-                                              var a = PollOption(
+                                               return PollOption(
                                                 id: option.id.toString(),
                                                 title: Text(
                                                   option.title.toString(),
@@ -496,7 +497,6 @@ class _HomePageState extends State<HomePage> {
                                                 votes: option.quantityOfVotes
                                                     .toInt(),
                                               );
-                                              return a;
                                             },
                                           ),
                                         ),
@@ -505,6 +505,7 @@ class _HomePageState extends State<HomePage> {
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
                                         ),
+                                        leadingVotedProgessColor: Colors.green,
                                       ),
                                       Row(
                                         children: [
@@ -555,7 +556,7 @@ class _HomePageState extends State<HomePage> {
     final int userId = sharedPreferences.getInt('userId')!;
 
     final response = await http.post(
-      Uri.parse('http://192.168.182.235:5000/gateway/hub_digital/api/post'),
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/post'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()
@@ -563,7 +564,7 @@ class _HomePageState extends State<HomePage> {
       body: jsonEncode({
         'content': _contentPost.text,
         'user_id': userId,
-        'fixed': 'true',
+        'fixed': 'false',
       }),
     );
 
@@ -594,6 +595,44 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> deletePost(int postId) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString('token');
+
+    final response = await http.delete(
+      Uri.parse(
+          'http://192.168.1.74:5000/gateway/hub_digital/api/post/${postId}'),
+      headers: {
+        'Content-type': 'application/json',
+        'x-access-token': token.toString()
+      },
+    );
+
+    var body = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      setState(() {
+        futurePosts = getHub();
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color.fromARGB(
+              255, 40, 112, 194), // Definindo o fundo como branco
+          content: Center(
+            child: Text(
+              body['message'],
+              style: const TextStyle(
+                  color: Color.fromARGB(255, 255, 255,
+                      255) // Definindo a cor do texto como preto (opcional)
+                  ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
   Future<String> convertDateToDias(String datetime) async {
     DateTime data = DateTime.parse(datetime);
     DateTime dataAtual = DateTime.now();
@@ -609,14 +648,8 @@ class _HomePageState extends State<HomePage> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
 
-    print({
-      'survey_id': enquete,
-      'poll_option_id': optionId,
-      'user_id': userId,
-    });
-
     final response = await http.post(
-      Uri.parse('http://192.168.182.235:5000/gateway/hub_digital/api/vote'),
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/vote'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()

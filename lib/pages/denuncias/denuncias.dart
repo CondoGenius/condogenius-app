@@ -77,7 +77,7 @@ class _DenunciasState extends State<Denuncias> {
                     const Padding(
                       padding: EdgeInsets.all(30),
                       child: Text(
-                        'Reclamação',
+                        'Reclamações',
                         style: TextStyle(
                           decoration: TextDecoration.underline,
                           fontWeight: FontWeight.bold,
@@ -146,7 +146,7 @@ class _DenunciasState extends State<Denuncias> {
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
     final int? residenceId = sharedPreferences.getInt('residenceId');
-    const url = 'http://192.168.182.235:5000/gateway/api/complaints';
+    const url = 'http://192.168.1.74:5000/gateway/api/complaints';
     // ignore: use_build_context_synchronously
     final dioErrorHandler = DioErrorHandler(context);
 
@@ -177,7 +177,7 @@ class _DenunciasState extends State<Denuncias> {
                 255, 40, 112, 194), // Definindo o fundo como branco
             content: Center(
               child: Text(
-                'Denúncia enviada com sucesso !',
+                'Reclamação enviada com sucesso !',
                 style: TextStyle(
                   color: Color.fromARGB(255, 255, 255,
                       255), // Definindo a cor do texto como preto (opcional)

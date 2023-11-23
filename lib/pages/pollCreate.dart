@@ -179,7 +179,7 @@ class _PollCreateState extends State<PollCreate> {
     }
 
     final response = await http.post(
-      Uri.parse('http://192.168.182.235:5000/gateway/hub_digital/api/poll'),
+      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/poll'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString(),

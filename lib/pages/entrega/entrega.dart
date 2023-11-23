@@ -21,7 +21,7 @@ Future<List<DeliveryModel>> fetchItems() async {
   final dio = Dio();
 
   final response = await dio.get(
-    'http://192.168.182.235:5000/gateway/api/deliveries/residence/$residenceId',
+    'http://192.168.1.74:5000/gateway/api/deliveries/residence/$residenceId',
     options: Options(
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,
@@ -231,8 +231,7 @@ class _EntregaState extends State<Entrega> {
                                             ),
                                             Text(
                                               formatDateTime(
-                                                delivery.delivered_at,
-                                              ),
+                                                  delivery.delivered_at),
                                             ),
                                           ],
                                         ),
@@ -273,12 +272,15 @@ class _EntregaState extends State<Entrega> {
   }
 }
 
-String formatDateTime(String dateTimeString) {
+String formatDateTime(String? dateTimeString) {
+  if (dateTimeString == null || dateTimeString.isEmpty) {
+    return '-';
+  }
   // Converter a string em um objeto DateTime
   DateTime dateTime = DateTime.parse(dateTimeString);
 
   // Formatar a data e hora no formato desejado
-  String formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
+  String formattedDate = DateFormat("dd/MM/yyyy 'às' HH:mm").format(dateTime);
 
   return formattedDate;
 }
