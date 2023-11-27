@@ -21,7 +21,7 @@ Future<List<DeliveryModel>> fetchItems() async {
   final dio = Dio();
 
   final response = await dio.get(
-    'http://192.168.1.74:5000/gateway/api/deliveries/residence/$residenceId',
+    'https://b543-45-188-17-163.ngrok-free.app/gateway/api/deliveries/residence/$residenceId',
     options: Options(
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,

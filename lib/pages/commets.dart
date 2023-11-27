@@ -31,7 +31,7 @@ class CommentPageState extends State<CommentPage> {
     final dio = Dio();
 
     final response = await dio.get(
-      'http://192.168.1.74:5000/gateway/hub_digital/api/comment/$id',
+      'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment/$id',
       options: Options(
         contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
@@ -257,10 +257,10 @@ class CommentPageState extends State<CommentPage> {
                                                 onTap: () {
                                                   deleteComment(comment.id);
                                                 },
-                                                child: const Icon(
+                                                child: Icon(
                                                   Icons.delete,
-                                                  color: Colors
-                                                      .red, // You can customize the color
+                                                  color: Colors.black.withOpacity(
+                                                      0.4), // You can customize the color
                                                 ),
                                               ),
                                           ],
@@ -310,7 +310,7 @@ class CommentPageState extends State<CommentPage> {
 
     final response = await http.delete(
       Uri.parse(
-          'http://192.168.1.74:5000/gateway/hub_digital/api/comment/$commentID'),
+          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment/$commentID'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString(),
@@ -349,7 +349,8 @@ class CommentPageState extends State<CommentPage> {
     final int userId = sharedPreferences.getInt('userId')!;
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/comment'),
+      Uri.parse(
+          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString(),
@@ -362,6 +363,7 @@ class CommentPageState extends State<CommentPage> {
     );
 
     if (response.statusCode == 201) {
+      _commentController.clear();
       // Comment saved successfully, update the comment list
       setState(() {
         commentsArray = fetchComments(widget.post.id);

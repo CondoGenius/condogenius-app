@@ -19,7 +19,7 @@ Future<AcademicAbility> getAcademic() async {
   final String? token = sharedPreferences.getString('token');
 
   final response = await http.get(
-    Uri.parse('http://192.168.1.74:5000/gateway/api/checks/active'),
+    Uri.parse('https://b543-45-188-17-163.ngrok-free.app/gateway/api/checks/active'),
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -279,7 +279,7 @@ class _AcademiaState extends State<Academia> {
     residentName = sharedPreferences.getString('name');
 
     final dio = Dio();
-    const url = 'http://192.168.1.74:5000/gateway/api/checks/resident/';
+    const url = 'https://b543-45-188-17-163.ngrok-free.app/gateway/api/checks/resident/';
 
     final response = await dio.get(
       '$url$residentId',
@@ -304,7 +304,7 @@ class _AcademiaState extends State<Academia> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
-    const url = 'http://192.168.1.74:5000/gateway/api/checks';
+    const url = 'https://b543-45-188-17-163.ngrok-free.app/gateway/api/checks';
 
     final response = await Dio().delete(
       url,
@@ -347,7 +347,7 @@ class _AcademiaState extends State<Academia> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
-    const url = 'http://192.168.1.74:5000/gateway/api/checks';
+    const url = 'https://b543-45-188-17-163.ngrok-free.app/gateway/api/checks';
 
     final response = await Dio().post(
       url,

@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
     final dio = Dio();
 
     final response = await dio.get(
-      'http://192.168.1.74:5000/gateway/hub_digital/api/post',
+      'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post',
       options: Options(
         contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
@@ -79,6 +79,14 @@ class _HomePageState extends State<HomePage> {
       final List<dynamic> data = response.data;
       return data.map((item) => Post.fromJson(item)).toList();
     } else if (response.statusCode == 401) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+      await prefs.remove('email');
+      await prefs.remove('userId');
+      await prefs.remove('residentId');
+      await prefs.remove('residenceId');
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushReplacementNamed('/login');
       throw Exception('Login Expirado');
     } else {
       throw Exception('Falha ao carregar dados da API');
@@ -324,8 +332,8 @@ class _HomePageState extends State<HomePage> {
                                               },
                                               child: Icon(
                                                 Icons.delete,
-                                                color: Colors.black
-                                                    .withOpacity(0.4),// You can customize the color
+                                                color: Colors.black.withOpacity(
+                                                    0.4), // You can customize the color
                                               ),
                                             ),
                                         ],
@@ -485,7 +493,7 @@ class _HomePageState extends State<HomePage> {
                                         pollOptions: List<PollOption>.from(
                                           post.poll!.options.map(
                                             (option) {
-                                               return PollOption(
+                                              return PollOption(
                                                 id: option.id.toString(),
                                                 title: Text(
                                                   option.title.toString(),
@@ -556,7 +564,8 @@ class _HomePageState extends State<HomePage> {
     final int userId = sharedPreferences.getInt('userId')!;
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/post'),
+      Uri.parse(
+          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()
@@ -601,7 +610,7 @@ class _HomePageState extends State<HomePage> {
 
     final response = await http.delete(
       Uri.parse(
-          'http://192.168.1.74:5000/gateway/hub_digital/api/post/${postId}'),
+          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post/${postId}'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()
@@ -649,7 +658,8 @@ class _HomePageState extends State<HomePage> {
     final String? token = sharedPreferences.getString('token');
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.74:5000/gateway/hub_digital/api/vote'),
+      Uri.parse(
+          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/vote'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()
