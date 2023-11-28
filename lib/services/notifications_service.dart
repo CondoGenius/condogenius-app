@@ -13,7 +13,9 @@ class FirebaseApi {
     await _firebaseMessaging.requestPermission();
     final fcmToken = await _firebaseMessaging.getToken();
 
-    const url = 'https://b543-45-188-17-163.ngrok-free.app/gateway/residents/api/residents/';
+    print(fcmToken);
+
+    const url = 'https://d62c-45-188-17-163.ngrok-free.app/gateway/residents/api/residents/';
 
     if (residentId != null) {
       final response = await Dio().put(

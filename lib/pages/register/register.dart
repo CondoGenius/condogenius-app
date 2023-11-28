@@ -222,7 +222,7 @@ class _RegisterState extends State<Register> {
   }
 
   void logar() async {
-    const url = 'https://b543-45-188-17-163.ngrok-free.app/gateway/user/register';
+    const url = 'https://d62c-45-188-17-163.ngrok-free.app/gateway/user/register';
     final dio = Dio();
 
     if (_senhaController.text != _confirController.text) {

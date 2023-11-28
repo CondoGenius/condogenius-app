@@ -31,7 +31,7 @@ class CommentPageState extends State<CommentPage> {
     final dio = Dio();
 
     final response = await dio.get(
-      'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment/$id',
+      'https://d62c-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment/$id',
       options: Options(
         contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
@@ -310,7 +310,7 @@ class CommentPageState extends State<CommentPage> {
 
     final response = await http.delete(
       Uri.parse(
-          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment/$commentID'),
+          'https://d62c-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment/$commentID'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString(),
@@ -350,7 +350,7 @@ class CommentPageState extends State<CommentPage> {
 
     final response = await http.post(
       Uri.parse(
-          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment'),
+          'https://d62c-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/comment'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString(),
@@ -373,7 +373,7 @@ class CommentPageState extends State<CommentPage> {
 
   String formatDateTime(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString);
-    String formattedDate = DateFormat("dd/MM 'às' HH:mm").format(dateTime);
+    String formattedDate = DateFormat("dd/MM").format(dateTime);
     return formattedDate;
   }
 }

@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
     final dio = Dio();
 
     final response = await dio.get(
-      'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post',
+      'https://d62c-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post',
       options: Options(
         contentType: Headers.jsonContentType,
         responseType: ResponseType.json,
@@ -498,7 +498,7 @@ class _HomePageState extends State<HomePage> {
                                                 title: Text(
                                                   option.title.toString(),
                                                   style: const TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: 13,
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
@@ -565,7 +565,7 @@ class _HomePageState extends State<HomePage> {
 
     final response = await http.post(
       Uri.parse(
-          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post'),
+          'https://d62c-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()
@@ -610,7 +610,7 @@ class _HomePageState extends State<HomePage> {
 
     final response = await http.delete(
       Uri.parse(
-          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post/${postId}'),
+          'https://d62c-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/post/${postId}'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()
@@ -659,7 +659,7 @@ class _HomePageState extends State<HomePage> {
 
     final response = await http.post(
       Uri.parse(
-          'https://b543-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/vote'),
+          'https://d62c-45-188-17-163.ngrok-free.app/gateway/hub_digital/api/vote'),
       headers: {
         'Content-type': 'application/json',
         'x-access-token': token.toString()

@@ -146,7 +146,7 @@ class _DenunciasState extends State<Denuncias> {
     final String? token = sharedPreferences.getString('token');
     final int? residentId = sharedPreferences.getInt('residentId');
     final int? residenceId = sharedPreferences.getInt('residenceId');
-    const url = 'https://b543-45-188-17-163.ngrok-free.app/gateway/api/complaints';
+    const url = 'https://d62c-45-188-17-163.ngrok-free.app/gateway/api/complaints';
     // ignore: use_build_context_synchronously
     final dioErrorHandler = DioErrorHandler(context);
 
@@ -155,7 +155,7 @@ class _DenunciasState extends State<Denuncias> {
         url,
         data: {
           'description': _denunciaController.text,
-          'Status': 'Em análise',
+          'Status': 'analysis',
           'resident_id': residentId,
           'residence_id': residenceId
         },
